@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Dashboard — Asesoría Financiera</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;background:#f5f5f3;color:#1a1a18}
+@media(prefers-color-scheme:dark){body{background:#111110;color:#e8e8e4}}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:0.5px solid rgba(0,0,0,.12);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+@media(prefers-color-scheme:dark){.topbar{background:#1c1c1a;border-color:rgba(255,255,255,.1)}}
+.topbar-title{font-size:14px;font-weight:500}
+.topbar-sub{font-size:11px;color:#888;margin-top:1px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px;transition:background .3s}
+.status-dot.loading{background:#f59e0b;animation:pulse 1s infinite}
+.status-dot.error{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tabs{background:#fff;border-bottom:0.5px solid rgba(0,0,0,.12);padding:0 16px;display:flex;gap:0;overflow-x:auto}
+@media(prefers-color-scheme:dark){.tabs{background:#1c1c1a;border-color:rgba(255,255,255,.1)}}
+.tab{padding:10px 14px;font-size:12px;font-weight:500;color:#888;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab.active{color:#1a1a18;border-color:#3b82f6}
+@media(prefers-color-scheme:dark){.tab.active{color:#e8e8e4}}
+.content{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:900px;margin:0 auto;width:100%}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.kpi{background:#f9f9f7;border-radius:8px;padding:12px;border:0.5px solid rgba(0,0,0,.1)}
+@media(prefers-color-scheme:dark){.kpi{background:#242422;border-color:rgba(255,255,255,.08)}}
+.kpi-val{font-size:22px;font-weight:500;line-height:1;margin-bottom:3px}
+.kpi-label{font-size:11px;color:#888}
+.kpi-sub{font-size:10px;color:#aaa;margin-top:2px}
+.card{background:#fff;border-radius:10px;border:0.5px solid rgba(0,0,0,.1);overflow:hidden}
+@media(prefers-color-scheme:dark){.card{background:#1c1c1a;border-color:rgba(255,255,255,.08)}}
+.card-header{padding:10px 14px;border-bottom:0.5px solid rgba(0,0,0,.08);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+@media(prefers-color-scheme:dark){.card-header{border-color:rgba(255,255,255,.06)}}
+.card-body{padding:12px 14px}
+.funnel-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.funnel-label{font-size:12px;width:100px;color:#888;flex-shrink:0}
+.funnel-track{flex:1;background:rgba(0,0,0,.06);border-radius:3px;height:22px;overflow:hidden}
+@media(prefers-color-scheme:dark){.funnel-track{background:rgba(255,255,255,.08)}}
+.funnel-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:500;color:#fff;transition:width .6s ease}
+.funnel-count{font-size:12px;font-weight:500;min-width:28px;text-align:right}
+.funnel-conv{font-size:10px;color:#aaa;min-width:40px;text-align:right}
+.prospect-list{display:flex;flex-direction:column;gap:5px;max-height:480px;overflow-y:auto}
+.prospect-row{background:#f9f9f7;border-radius:8px;padding:9px 11px;border:0.5px solid rgba(0,0,0,.08);display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center}
+@media(prefers-color-scheme:dark){.prospect-row{background:#242422;border-color:rgba(255,255,255,.06)}}
+@media(max-width:600px){.prospect-row{grid-template-columns:1fr auto auto}}
+.prospect-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prospect-sub{font-size:10px;color:#888}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:500;white-space:nowrap}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-yellow{background:#fef9c3;color:#854d0e}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.badge-gray{background:#f3f4f6;color:#374151}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+@media(prefers-color-scheme:dark){
+  .badge-green{background:#14532d;color:#86efac}
+  .badge-yellow{background:#713f12;color:#fde68a}
+  .badge-red{background:#7f1d1d;color:#fca5a5}
+  .badge-blue{background:#1e3a5f;color:#93c5fd}
+  .badge-orange{background:#431407;color:#fdba74}
+  .badge-purple{background:#2e1065;color:#c4b5fd}
+  .badge-gray{background:#2a2a28;color:#9ca3af}
+}
+.score-bar{width:54px;background:rgba(0,0,0,.08);border-radius:3px;height:5px;overflow:hidden;margin-left:auto;margin-top:3px}
+@media(prefers-color-scheme:dark){.score-bar{background:rgba(255,255,255,.1)}}
+.score-fill{height:100%;border-radius:3px}
+.product-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:#f0f9ff;color:#0369a1;border:0.5px solid #bae6fd;white-space:nowrap}
+@media(prefers-color-scheme:dark){.product-tag{background:#0c2a3d;color:#7dd3fc;border-color:#0e4463}}
+.chip{font-size:9px;padding:2px 6px;border-radius:3px;white-space:nowrap;font-weight:500}
+.chip-ok{background:#dcfce7;color:#166534}
+.chip-soon{background:#fef9c3;color:#854d0e}
+.chip-urgent{background:#fee2e2;color:#991b1b}
+.chip-wait{background:#f3f4f6;color:#6b7280}
+@media(prefers-color-scheme:dark){
+  .chip-ok{background:#14532d;color:#86efac}
+  .chip-soon{background:#713f12;color:#fde68a}
+  .chip-urgent{background:#7f1d1d;color:#fca5a5}
+  .chip-wait{background:#2a2a28;color:#9ca3af}
+}
+.chat-box{background:#fff;border-radius:10px;border:0.5px solid rgba(0,0,0,.1);overflow:hidden;display:flex;flex-direction:column}
+@media(prefers-color-scheme:dark){.chat-box{background:#1c1c1a;border-color:rgba(255,255,255,.08)}}
+.chat-messages{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:140px;max-height:320px;overflow-y:auto}
+.msg{padding:9px 12px;border-radius:8px;font-size:13px;line-height:1.5;max-width:90%}
+.msg-user{background:#3b82f6;color:#fff;align-self:flex-end;border-radius:8px 8px 2px 8px}
+.msg-ai{background:#f9f9f7;border:0.5px solid rgba(0,0,0,.08);align-self:flex-start;border-radius:8px 8px 8px 2px;color:#1a1a18}
+@media(prefers-color-scheme:dark){.msg-ai{background:#242422;border-color:rgba(255,255,255,.06);color:#e8e8e4}}
+.chat-input-row{border-top:0.5px solid rgba(0,0,0,.08);padding:8px;display:flex;gap:6px}
+@media(prefers-color-scheme:dark){.chat-input-row{border-color:rgba(255,255,255,.06)}}
+.chat-input{flex:1;font-size:13px;padding:8px 12px;border-radius:8px;border:0.5px solid rgba(0,0,0,.15);background:#f9f9f7;color:#1a1a18;outline:none;font-family:inherit}
+@media(prefers-color-scheme:dark){.chat-input{background:#242422;border-color:rgba(255,255,255,.1);color:#e8e8e4}}
+.chat-send{font-size:12px;padding:8px 14px;border-radius:8px;background:#3b82f6;color:#fff;border:none;cursor:pointer;font-weight:500;font-family:inherit;white-space:nowrap}
+.chat-send:disabled{opacity:.4;cursor:default}
+.quick-btns{padding:0 8px 8px;display:flex;flex-wrap:wrap;gap:4px}
+.quick-btn{font-size:11px;padding:4px 10px;border-radius:20px;border:0.5px solid rgba(0,0,0,.12);background:#f9f9f7;cursor:pointer;color:#555;font-family:inherit;transition:background .1s}
+.quick-btn:hover{background:#e5e5e3}
+@media(prefers-color-scheme:dark){.quick-btn{background:#242422;border-color:rgba(255,255,255,.08);color:#aaa}.quick-btn:hover{background:#2e2e2c}}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.filter-select{font-size:11px;padding:5px 8px;border-radius:6px;border:0.5px solid rgba(0,0,0,.12);background:#f9f9f7;color:#1a1a18;font-family:inherit}
+@media(prefers-color-scheme:dark){.filter-select{background:#242422;border-color:rgba(255,255,255,.1);color:#e8e8e4}}
+.alert-warn{background:#fffbeb;border:0.5px solid #fcd34d;border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:9px 13px;font-size:11px;color:#92400e;line-height:1.6}
+@media(prefers-color-scheme:dark){.alert-warn{background:#292116;border-color:#92400e;color:#fde68a}}
+.api-key-box{background:#fff;border-radius:10px;border:0.5px solid rgba(0,0,0,.1);padding:20px;text-align:center}
+@media(prefers-color-scheme:dark){.api-key-box{background:#1c1c1a;border-color:rgba(255,255,255,.08)}}
+.api-key-input{width:100%;max-width:400px;font-size:13px;padding:9px 12px;border-radius:8px;border:0.5px solid rgba(0,0,0,.15);background:#f9f9f7;color:#1a1a18;outline:none;font-family:inherit;margin:12px 0 8px;text-align:center}
+@media(prefers-color-scheme:dark){.api-key-input{background:#242422;border-color:rgba(255,255,255,.1);color:#e8e8e4}}
+.btn-primary{font-size:12px;padding:8px 18px;border-radius:8px;background:#3b82f6;color:#fff;border:none;cursor:pointer;font-weight:500;font-family:inherit}
+.hidden-mobile{display:block}
+@media(max-width:520px){.hidden-mobile{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="root"></div>
+<script>
+const SHEET_ID='1LT2BGviwchlvf3CgKjxIGpt6YZu-YwYCZj394xefcH8';
+const TODAY=new Date('2026-06-09');
+const INCOME_MAP={'hasta 1M':1,'1M a 2M':2,'2M a 3,5M':3,'3,5M a 6M':4,'más 6M':5};
+const INCOME_LABEL={'hasta 1M':'<1M','1M a 2M':'1–2M','2M a 3,5M':'2–3.5M','3,5M a 6M':'3.5–6M','más 6M':'+6M'};
+
+const RELATION_SCORE=v=>{
+  v=(v||'').toLowerCase();
+  if(['madre','padre','hermano','hermana','suegra','suegro','cuñada','cuñado','esposa','esposo'].some(x=>v.includes(x)))return 5;
+  if(['amigo','prima','primo','tío','tía','concuñado'].some(x=>v.includes(x)))return 4;
+  if(['referido'].some(x=>v.includes(x)))return 3;
+  if(['novia','novio'].some(x=>v.includes(x)))return 3;
+  if(['ex ball','ex quilmes','ex bgh','ex isover','ex unqui','ex alemán','elac','q21'].some(x=>v.includes(x)))return 2;
+  return 1;
+};
+const STAGE_SCORE=s=>{
+  if(!s)return 0;s=s.toLowerCase();
+  if(s.includes('cerrado')||s.includes('ganado'))return 10;
+  if(s.includes('reunión 2')||s.includes('reunion 2'))return 8;
+  if(s.includes('reunión 1')||s.includes('reunion 1'))return 5;
+  if(s.includes('solo contactado'))return 3;
+  return 0;
+};
+function parseDate(v){
+  if(!v)return null;
+  const s=String(v).trim();
+  if(!s||s.length<4)return null;
+  if(/^\d{4,6}$/.test(s)){const n=parseInt(s);if(n>40000&&n<60000)return new Date((n-25569)*86400*1000);}
+  const parts=s.split('/');
+  if(parts.length===3){const y=parseInt(parts[2]);if(y<1900||y>2100)return null;return new Date(y,parseInt(parts[1])-1,parseInt(parts[0]));}
+  const d=new Date(s);return isNaN(d)?null:d;
+}
+function daysSince(d){if(!d)return null;return Math.floor((TODAY-d)/86400000);}
+function calcScore(p){
+  const inc=(INCOME_MAP[p.ingreso]||0)/5;
+  const conf=(parseFloat(p.confianza)||0)/5;
+  const rel=RELATION_SCORE(p.relacion)/5;
+  const stage=STAGE_SCORE(p.etapa)/8;
+  const d=p.diasSinActividad;
+  let temp=1;
+  if(d!==null){if(d>60)temp=0.2;else if(d>30)temp=0.5;else if(d>14)temp=0.7;else temp=1;}
+  return Math.round((inc*0.30+conf*0.25+stage*0.20+temp*0.15+rel*0.10)*100);
+}
+function suggestProduct(p){
+  const inc=INCOME_MAP[p.ingreso]||0;
+  const conf=parseFloat(p.confianza)||0;
+  const occ=(p.ocupacion||'').toLowerCase();
+  const age=p.edad||'';
+  const isDueno=occ.includes('dueño')||occ.includes('independiente');
+  if(inc>=4&&(age.includes('40')||age.includes('50')||age.includes('60')))return{label:'Retiro IT',color:'badge-purple'};
+  if(inc>=4&&conf>=4)return{label:'Vida Zurich',color:'badge-blue'};
+  if(inc>=3&&conf>=3)return{label:'Vida Life',color:'badge-blue'};
+  if(isDueno)return{label:'Patrimonial',color:'badge-orange'};
+  if(inc>=3)return{label:'Ahorro',color:'badge-green'};
+  return{label:'Patrimonial',color:'badge-orange'};
+}
+function reintento(p){
+  const s=(p.etapa||'').toLowerCase();const d=p.diasSinActividad;
+  if(d===null)return{label:'Sin actividad',cls:'chip-wait'};
+  if(s.includes('reunión 2')||s.includes('reunion 2')){
+    if(d<=3)return{label:'Cerrar hoy',cls:'chip-urgent'};
+    if(d<=7)return{label:'Urgente',cls:'chip-urgent'};
+    if(d<=15)return{label:'Esta semana',cls:'chip-soon'};
+    if(d<=30)return{label:'Propuesta alt.',cls:'chip-soon'};
+    return{label:'Pausa 60d',cls:'chip-wait'};
+  }
+  if(s.includes('reunión 1')||s.includes('reunion 1')){
+    if(d<=5)return{label:'Seguimiento',cls:'chip-ok'};
+    if(d<=10)return{label:'Propuesta WA',cls:'chip-soon'};
+    if(d<=21)return{label:'¿Cambió algo?',cls:'chip-soon'};
+    if(d<=45)return{label:'Última llamada',cls:'chip-urgent'};
+    return{label:'Pausa 90d',cls:'chip-wait'};
+  }
+  if(s.includes('solo contactado')){
+    if(d<=7)return{label:'2do intento',cls:'chip-ok'};
+    if(d<=14)return{label:'3er intento',cls:'chip-soon'};
+    if(d<=21)return{label:'Último intento',cls:'chip-urgent'};
+    return{label:'Archivar',cls:'chip-wait'};
+  }
+  return{label:'Contactar',cls:'chip-ok'};
+}
+function tempBadge(p){
+  const s=(p.etapa||'').toLowerCase();const d=p.diasSinActividad;
+  if(s.includes('cerrado')||s.includes('ganado'))return{label:'Cerrado',cls:'badge-green'};
+  if(d===null)return{label:'Sin contactar',cls:'badge-gray'};
+  if(s.includes('reunión 2')||s.includes('reunion 2')){
+    if(d<=14)return{label:'Caliente',cls:'badge-red'};
+    if(d<=30)return{label:'Tibio',cls:'badge-orange'};
+    return{label:'Enfriando',cls:'badge-yellow'};
+  }
+  if(s.includes('reunión 1')||s.includes('reunion 1')){
+    if(d<=10)return{label:'Activo',cls:'badge-orange'};
+    if(d<=21)return{label:'Tibio',cls:'badge-yellow'};
+    return{label:'Frío',cls:'badge-blue'};
+  }
+  if(s.includes('solo contactado')){
+    if(d<=7)return{label:'Reciente',cls:'badge-yellow'};
+    return{label:'Sin respuesta',cls:'badge-gray'};
+  }
+  return{label:'Pendiente',cls:'badge-gray'};
+}
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  return lines.slice(1).map(line=>{
+    const vals=[];let cur='';let inQ=false;
+    for(let i=0;i<line.length;i++){
+      if(line[i]==='"'){inQ=!inQ;}
+      else if(line[i]===','&&!inQ){vals.push(cur.trim());cur='';}
+      else cur+=line[i];
+    }
+    vals.push(cur.trim());
+    const obj={};
+    headers.forEach((h,i)=>obj[h]=(vals[i]||'').replace(/"/g,'').trim());
+    return obj;
+  });
+}
+function normalizeRow(r){
+  const nombre=r['Nombre']||r['nombre']||'';
+  if(!nombre||nombre.toLowerCase()==='nombre')return null;
+  const fechaC=parseDate(r['Primer contacto fecha']);
+  const fechaR1=parseDate(r['Reunión 1 fecha']||r['Reunion 1 fecha']);
+  const fechaR2=parseDate(r['Reunión 2 fecha']||r['Reunion 2 fecha']);
+  const fechaR3=parseDate(r['Reunión 3']||r['Reunion 3']);
+  const fechaCierre=parseDate(r['Cierre']);
+  const etapa=r['Etapa Actual']||r['etapa actual']||'';
+  const esCerrado=etapa.toLowerCase().includes('cerrado')||etapa.toLowerCase().includes('ganado')||!!fechaCierre;
+  let lastDate=fechaR2||fechaR1||fechaC;
+  if(fechaCierre)lastDate=fechaCierre;
+  const diasSinActividad=(lastDate&&!esCerrado)?daysSince(lastDate):null;
+  const p={nombre,relacion:r['Relación']||r['Relacion']||'',ubicacion:r['Ubicación']||r['Ubicacion']||'',ocupacion:r['Ocupación']||r['Ocupacion']||'',ingreso:r['Ingreso estimado']||'',edad:r['Edad']||'',confianza:r['Confianza']||'',etapa,referidos:r['Referidos']||'',fechaC,fechaR1,fechaR2,fechaR3,fechaCierre,diasSinActividad,esCerrado};
+  p.score=calcScore(p);p.producto=suggestProduct(p);p.reintentoInfo=reintento(p);p.tempInfo=tempBadge(p);
+  return p;
+}
+
+let allProspects=[];
+let chatMessages=[{role:'ai',text:'Hola. Soy tu director comercial IA. Tengo acceso a tu pipeline en tiempo real. Preguntame sobre prospectos específicos, prioridades de la semana, cómo avanzar con alguien, o qué producto sugerir para cada perfil.'}];
+let currentTab='pipeline';
+let filterStage='all';
+let filterScore='all';
+let chatLoading=false;
+let dataStatus='loading';
+let apiKey=localStorage.getItem('crm_api_key')||'';
+let loadedAt=null;
+
+async function fetchData(){
+  const urls=[
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`,
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`,
+  ];
+  for(const url of urls){
+    try{
+      const r=await fetch(url,{cache:'no-store'});
+      if(r.ok){const text=await r.text();if(text.includes('Nombre')||text.includes('nombre'))return text;}
+    }catch(e){}
+  }
+  return null;
+}
+
+async function init(){
+  render();
+  const text=await fetchData();
+  if(text){
+    const rows=parseCSV(text);
+    allProspects=rows.map(normalizeRow).filter(Boolean);
+    dataStatus='ok';loadedAt=new Date();
+  }else{
+    dataStatus='error';
+  }
+  render();
+}
+
+function el(tag,props={},children=[]){
+  const e=document.createElement(tag);
+  Object.entries(props).forEach(([k,v])=>{
+    if(k==='className')e.className=v;
+    else if(k==='style'&&typeof v==='object')Object.assign(e.style,v);
+    else if(k.startsWith('on'))e[k]=v;
+    else e.setAttribute(k,v);
+  });
+  children.forEach(c=>{
+    if(typeof c==='string')e.appendChild(document.createTextNode(c));
+    else if(c)e.appendChild(c);
+  });
+  return e;
+}
+
+function render(){
+  const root=document.getElementById('root');
+  root.innerHTML='';
+
+  const timeStr=loadedAt?loadedAt.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';
+  const statusText=dataStatus==='ok'?`Sheets conectado · ${timeStr}`:dataStatus==='error'?'Sin acceso al Sheet (publicalo desde Archivo → Publicar en la web)':'Cargando...';
+
+  const topbar=el('div',{className:'topbar'},[
+    el('div',{},[
+      el('div',{className:'topbar-title'},[
+        el('span',{className:`status-dot ${dataStatus==='ok'?'':dataStatus==='error'?'error':'loading'}`}),
+        'CRM — Asesoría Financiera'
+      ]),
+      el('div',{className:'topbar-sub'},[statusText])
+    ]),
+    el('div',{style:{textAlign:'right',fontSize:'11px',color:'#888'}},[
+      el('div',{},[(allProspects.length||'—')+' prospectos · '+(allProspects.filter(p=>p.esCerrado).length||'0')+' cerrados']),
+      el('button',{style:{fontSize:'10px',padding:'3px 8px',borderRadius:'5px',border:'0.5px solid rgba(0,0,0,.15)',background:'transparent',cursor:'pointer',marginTop:'3px',fontFamily:'inherit'},onclick:()=>init()},['↺ Actualizar'])
+    ])
+  ]);
+  root.appendChild(topbar);
+
+  const tabs=el('div',{className:'tabs'});
+  [['pipeline','Pipeline'],['score','Prioridad'],['nuevos','Nuevos'],['chat','Chat IA']].forEach(([id,label])=>{
+    const t=el('div',{className:'tab'+(currentTab===id?' active':''),onclick:()=>{currentTab=id;render();}},[label]);
+    tabs.appendChild(t);
+  });
+  root.appendChild(tabs);
+
+  const content=el('div',{className:'content'});
+  root.appendChild(content);
+
+  const activos=allProspects.filter(p=>p.fechaC&&!p.esCerrado);
+  const cerrados=allProspects.filter(p=>p.esCerrado);
+  const totalDB=allProspects.length;
+  const totalContactados=allProspects.filter(p=>p.fechaC).length;
+  const totalR1=allProspects.filter(p=>p.fechaR1).length;
+  const totalR2=allProspects.filter(p=>p.fechaR2).length;
+  const enR2=activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 2')).length;
+
+  if(currentTab==='pipeline'){
+    const kgrid=el('div',{className:'kpi-grid'});
+    [{val:totalDB,label:'Total BD',sub:'prospectos',color:''},{val:totalContactados,label:'Contactados',sub:totalDB?Math.round(totalContactados/totalDB*100)+'% de la BD':'',color:'#f59e0b'},{val:totalR1,label:'Reunión 1',sub:totalContactados?Math.round(totalR1/totalContactados*100)+'% conv.':'',color:'#3b82f6'},{val:totalR2,label:'Reunión 2',sub:totalR1?Math.round(totalR2/totalR1*100)+'% conv.':'',color:'#8b5cf6'},{val:cerrados.length,label:'Cerrados',sub:totalContactados?Math.round(cerrados.length/totalContactados*100)+'% global':'',color:'#22c55e'},{val:enR2,label:'En R2 ahora',sub:'listos para cerrar',color:'#ef4444'}].forEach(k=>{
+      const d=el('div',{className:'kpi'},[
+        el('div',{className:'kpi-val',style:{color:k.color||'inherit'}},[String(k.val)]),
+        el('div',{className:'kpi-label'},[k.label]),
+        el('div',{className:'kpi-sub'},[k.sub])
+      ]);
+      kgrid.appendChild(d);
+    });
+    content.appendChild(kgrid);
+
+    const fc=el('div',{className:'card'});
+    fc.appendChild(el('div',{className:'card-header'},['Embudo comercial']));
+    const fb=el('div',{className:'card-body'});
+    [{label:'BD total',n:totalDB,color:'#94a3b8',conv:''},{label:'Contactados',n:totalContactados,color:'#f59e0b',conv:totalDB?Math.round(totalContactados/totalDB*100)+'%':''},{label:'Reunión 1',n:totalR1,color:'#3b82f6',conv:totalContactados?Math.round(totalR1/totalContactados*100)+'%':''},{label:'Reunión 2',n:totalR2,color:'#8b5cf6',conv:totalR1?Math.round(totalR2/totalR1*100)+'%':''},{label:'Cerrados',n:cerrados.length,color:'#22c55e',conv:totalR2?Math.round(cerrados.length/totalR2*100)+'%':''}].forEach(s=>{
+      const pct=totalDB?Math.max(Math.round(s.n/totalDB*100),s.n>0?3:0):0;
+      const row=el('div',{className:'funnel-bar'},[
+        el('span',{className:'funnel-label'},[s.label]),
+        el('div',{className:'funnel-track'},[
+          el('div',{className:'funnel-fill',style:{width:pct+'%',background:s.color}},[s.n>2?String(s.n):''])
+        ]),
+        el('span',{className:'funnel-count'},[String(s.n)]),
+        el('span',{className:'funnel-conv'},[s.conv])
+      ]);
+      fb.appendChild(row);
+    });
+    fc.appendChild(fb);content.appendChild(fc);
+
+    const urgentes=activos.filter(p=>p.reintentoInfo.cls==='chip-urgent').length;
+    if(urgentes>0){
+      content.appendChild(el('div',{className:'alert-warn'},[`${urgentes} prospecto${urgentes>1?'s requieren':'requiere'} acción urgente hoy. Revisalos en la pestaña Prioridad.`]));
+    }
+
+    const pc=el('div',{className:'card'});
+    const ph=el('div',{className:'card-header'});
+    ph.appendChild(document.createTextNode('Prospectos activos'));
+    const frow=el('div',{className:'filter-row',style:{padding:'8px 8px 0'}});
+    const s1=el('select',{className:'filter-select',onchange:e=>{filterStage=e.target.value;render();}});
+    [['all','Todas las etapas'],['Reunión 2','En R2'],['Reunión 1','En R1'],['Solo Contactado','Solo contactados']].forEach(([v,l])=>{
+      const o=el('option',{value:v},[l]);if(v===filterStage)o.selected=true;s1.appendChild(o);
+    });
+    const s2=el('select',{className:'filter-select',onchange:e=>{filterScore=e.target.value;render();}});
+    [['all','Todos los scores'],['high','Score >60'],['mid','Score 40–60'],['low','Score <40']].forEach(([v,l])=>{
+      const o=el('option',{value:v},[l]);if(v===filterScore)o.selected=true;s2.appendChild(o);
+    });
+    frow.appendChild(s1);frow.appendChild(s2);
+    pc.appendChild(ph);pc.appendChild(frow);
+
+    let filtered=activos.filter(p=>{
+      if(filterStage!=='all'&&!(p.etapa||'').toLowerCase().includes(filterStage.toLowerCase()))return false;
+      if(filterScore==='high'&&p.score<60)return false;
+      if(filterScore==='mid'&&(p.score<40||p.score>=60))return false;
+      if(filterScore==='low'&&p.score>=40)return false;
+      return true;
+    }).sort((a,b)=>b.score-a.score);
+
+    const list=el('div',{className:'prospect-list',style:{padding:'8px'}});
+    if(filtered.length===0){
+      list.appendChild(el('div',{style:{textAlign:'center',color:'#888',padding:'24px',fontSize:'12px'}},['No hay prospectos con esos filtros']));
+    }
+    filtered.forEach(p=>{
+      const sc=p.score>=70?'#22c55e':p.score>=45?'#f59e0b':'#ef4444';
+      const row=el('div',{className:'prospect-row'},[
+        el('div',{},[
+          el('div',{className:'prospect-name'},[p.nombre]),
+          el('div',{className:'prospect-sub'},[p.relacion+(p.ingreso?' · '+(INCOME_LABEL[p.ingreso]||p.ingreso):'')+' · conf.'+( p.confianza||'?')])
+        ]),
+        el('span',{className:'badge '+p.tempInfo.cls},[p.tempInfo.label]),
+        el('span',{className:'chip '+p.reintentoInfo.cls},[p.reintentoInfo.label]),
+        el('span',{className:'product-tag hidden-mobile'},[p.producto.label]),
+        el('div',{style:{textAlign:'right'}},[
+          el('div',{style:{fontSize:'12px',fontWeight:'500',color:sc}},[String(p.score)]),
+          el('div',{className:'score-bar'},[el('div',{className:'score-fill',style:{width:p.score+'%',background:sc}})])
+        ])
+      ]);
+      list.appendChild(row);
+    });
+    pc.appendChild(list);content.appendChild(pc);
+  }
+
+  else if(currentTab==='score'){
+    const ranked=allProspects.filter(p=>!p.esCerrado&&p.fechaC).sort((a,b)=>b.score-a.score);
+    const sc=el('div',{className:'card'});
+    const sh=el('div',{className:'card-header'},[
+      'Top prospectos por score  ',
+      el('span',{style:{fontSize:'10px',fontWeight:'400',color:'#888'}},['Ingreso 30% · Confianza 25% · Etapa 20% · Temperatura 15% · Relación 10%'])
+    ]);
+    sc.appendChild(sh);
+    const sl=el('div',{className:'prospect-list',style:{padding:'8px'}});
+    ranked.slice(0,25).forEach((p,i)=>{
+      const scCol=p.score>=70?'#22c55e':p.score>=45?'#f59e0b':'#ef4444';
+      const row=el('div',{className:'prospect-row'},[
+        el('div',{},[
+          el('div',{className:'prospect-name'},[el('span',{style:{color:'#aaa',marginRight:'5px'}},['#'+(i+1)]),p.nombre]),
+          el('div',{className:'prospect-sub'},[p.relacion+' · '+(p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'sin ingreso')+' · conf.'+(p.confianza||'?')])
+        ]),
+        el('span',{className:'badge '+p.tempInfo.cls},[p.tempInfo.label]),
+        el('span',{className:'chip '+p.reintentoInfo.cls},[p.reintentoInfo.label]),
+        el('span',{className:'product-tag hidden-mobile'},[p.producto.label]),
+        el('div',{style:{textAlign:'right'}},[
+          el('div',{style:{fontSize:'13px',fontWeight:'500',color:scCol}},[String(p.score)]),
+          el('div',{className:'score-bar'},[el('div',{className:'score-fill',style:{width:p.score+'%',background:scCol}})])
+        ])
+      ]);
+      sl.appendChild(row);
+    });
+    sc.appendChild(sl);content.appendChild(sc);
+  }
+
+  else if(currentTab==='nuevos'){
+    const sinContactar=allProspects.filter(p=>!p.fechaC&&!p.esCerrado).sort((a,b)=>b.score-a.score);
+    const byGroup={};
+    sinContactar.forEach(p=>{
+      const rel=(p.relacion||'').toLowerCase();
+      const g=rel.includes('ex quilmes')?'Ex Quilmes':rel.includes('ex ball')?'Ex Ball':rel.includes('ex bgh')?'Ex BGH':rel.includes('elac')?'ELAC':rel.includes('ex')||rel.includes('q21')?'Otros ex-colegas':'Familia, amigos y referidos';
+      if(!byGroup[g])byGroup[g]=[];
+      byGroup[g].push(p);
+    });
+    const order=['Familia, amigos y referidos','Ex Ball','Ex Quilmes','Ex BGH','ELAC','Otros ex-colegas'];
+    order.filter(g=>byGroup[g]).forEach(grp=>{
+      const prospects=byGroup[grp].slice(0,10);
+      const gc=el('div',{className:'card'});
+      gc.appendChild(el('div',{className:'card-header'},[
+        grp+' ',
+        el('span',{style:{fontSize:'10px',fontWeight:'400',color:'#888'}},[(byGroup[grp].length)+' sin contactar'])
+      ]));
+      const gl=el('div',{className:'prospect-list',style:{padding:'8px'}});
+      prospects.forEach(p=>{
+        const scCol=p.score>=55?'#22c55e':p.score>=35?'#f59e0b':'#9ca3af';
+        const row=el('div',{className:'prospect-row'},[
+          el('div',{},[
+            el('div',{className:'prospect-name'},[p.nombre]),
+            el('div',{className:'prospect-sub'},[(p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'sin ingreso')+' · '+( p.ocupacion||'—')+' · '+(p.edad||'—')+(p.ubicacion&&p.ubicacion!=='Argentina'?' · '+p.ubicacion:'')])
+          ]),
+          el('span',{style:{fontSize:'10px',color:'#888',whiteSpace:'nowrap'}},['conf. '+(p.confianza||'?')]),
+          el('span',{className:'chip chip-ok hidden-mobile'},['Contactar']),
+          el('span',{className:'product-tag hidden-mobile'},[p.producto.label]),
+          el('div',{style:{textAlign:'right',minWidth:'30px'}},[
+            el('div',{style:{fontSize:'12px',fontWeight:'500',color:scCol}},[String(p.score)])
+          ])
+        ]);
+        gl.appendChild(row);
+      });
+      gc.appendChild(gl);content.appendChild(gc);
+    });
+  }
+
+  else if(currentTab==='chat'){
+    if(!apiKey){
+      const box=el('div',{className:'api-key-box'});
+      box.innerHTML=`
+        <div style="font-size:16px;font-weight:500;margin-bottom:8px">Configurar Chat IA</div>
+        <div style="font-size:12px;color:#888;max-width:360px;margin:0 auto;line-height:1.6">Para usar el análisis con Claude, necesitás una API key de Anthropic. Es gratuita hasta cierto límite. <a href="https://console.anthropic.com/keys" target="_blank" style="color:#3b82f6">Obtener API key →</a></div>
+        <input class="api-key-input" type="password" id="api-key-inp" placeholder="sk-ant-..." />
+        <br>
+        <button class="btn-primary" onclick="saveKey()">Guardar y continuar</button>
+        <div style="font-size:10px;color:#aaa;margin-top:8px">La key se guarda solo en tu navegador (localStorage), no se envía a ningún servidor externo.</div>`;
+      content.appendChild(box);
+      return;
+    }
+
+    const chatCard=el('div',{className:'chat-box'});
+    const msgs=el('div',{className:'chat-messages',id:'chat-msgs'});
+    chatMessages.forEach(m=>{
+      const d=el('div',{className:'msg '+(m.role==='user'?'msg-user':'msg-ai')},[m.text]);
+      if(m.loading)d.style.color='#888';
+      msgs.appendChild(d);
+    });
+    chatCard.appendChild(msgs);
+
+    const quick=el('div',{className:'quick-btns'});
+    ['¿A quién llamo hoy?','Top 5 para cerrar esta semana','Análisis del embudo','¿Cuál es mi mejor segmento?','¿Qué hago con los prospectos fríos?','Prospectos familia sin contactar'].forEach(q=>{
+      const b=el('button',{className:'quick-btn',onclick:()=>sendChat(q)},[q]);
+      quick.appendChild(b);
+    });
+    chatCard.appendChild(quick);
+
+    const inputRow=el('div',{className:'chat-input-row'});
+    const inp=el('input',{type:'text',className:'chat-input',placeholder:'Preguntá sobre tu pipeline...'});
+    inp.onkeydown=e=>{if(e.key==='Enter'&&!chatLoading&&inp.value.trim())sendChat(inp.value);};
+    const btn=el('button',{className:'chat-send',onclick:()=>{if(inp.value.trim())sendChat(inp.value);}},['Enviar →']);
+    if(chatLoading)btn.disabled=true;
+    inputRow.appendChild(inp);inputRow.appendChild(btn);
+    chatCard.appendChild(inputRow);
+
+    const resetRow=el('div',{style:{padding:'4px 8px 8px',textAlign:'right'}});
+    resetRow.appendChild(el('button',{style:{fontSize:'10px',color:'#aaa',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'},onclick:()=>{apiKey='';localStorage.removeItem('crm_api_key');render();}},['Cambiar API key']));
+    chatCard.appendChild(resetRow);
+    content.appendChild(chatCard);
+    setTimeout(()=>{const m=document.getElementById('chat-msgs');if(m)m.scrollTop=m.scrollHeight;},50);
+  }
+}
+
+window.saveKey=function(){
+  const v=document.getElementById('api-key-inp').value.trim();
+  if(v){apiKey=v;localStorage.setItem('crm_api_key',v);render();}
+};
+
+async function sendChat(text){
+  chatInput='';
+  chatMessages.push({role:'user',text});
+  chatMessages.push({role:'ai',text:'Analizando tu pipeline...',loading:true});
+  chatLoading=true;render();
+
+  const activos=allProspects.filter(p=>p.fechaC&&!p.esCerrado);
+  const summary=`CRM asesor financiero Argentina. Productos principales:
+1) VIDA Y AHORRO (mayor comisión): Seguros de vida Zurich (premium) y Life; planes de retiro Investors Trust (exterior).
+2) INVERSIONES: INVIU (broker AR, +USD20k) o Investors Trust exterior (+USD10k).
+3) PATRIMONIAL: autos, hogar, comercio, ART.
+
+Pipeline hoy ${TODAY.toLocaleDateString('es-AR')}:
+- BD total: ${allProspects.length} | Activos: ${activos.length} | Cerrados: ${allProspects.filter(p=>p.esCerrado).length}
+- En R2 (próximos a cerrar): ${activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 2')).length}
+- En R1: ${activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 1')).length}
+
+Top activos por score:
+${activos.sort((a,b)=>b.score-a.score).slice(0,15).map(p=>`- ${p.nombre} | ${p.relacion} | ingreso:${p.ingreso||'?'} | conf:${p.confianza||'?'} | ${p.etapa} | ${p.diasSinActividad!==null?p.diasSinActividad+'d sin actividad':'sin actividad'} | score:${p.score} | producto:${p.producto.label} | acción:${p.reintentoInfo.label}`).join('\n')}
+
+Sin contactar (top por score):
+${allProspects.filter(p=>!p.fechaC&&!p.esCerrado).sort((a,b)=>b.score-a.score).slice(0,8).map(p=>`- ${p.nombre} | ${p.relacion} | ingreso:${p.ingreso||'?'} | conf:${p.confianza||'?'} | score:${p.score}`).join('\n')}`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        system:`Sos un director comercial experto en asesoría financiera en Argentina. Analizás el CRM del asesor y das recomendaciones concretas y accionables. Respondés en español argentino. Máximo 180 palabras. Priorizás la acción inmediata. Usás los nombres de los prospectos. Cuando sugerís un producto, justificás brevemente. Nunca empezás con "Claro" ni "Por supuesto".\n\n${summary}`,
+        messages:chatMessages.filter(m=>!m.loading).slice(-8).map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}))
+      })
+    });
+    const data=await resp.json();
+    const aiText=data.content?.[0]?.text||(data.error?.message||'Sin respuesta.');
+    chatMessages=chatMessages.filter(m=>!m.loading);
+    chatMessages.push({role:'ai',text:aiText});
+  }catch(e){
+    chatMessages=chatMessages.filter(m=>!m.loading);
+    chatMessages.push({role:'ai',text:'Error de conexión. Verificá que la API key sea correcta.'});
+  }
+  chatLoading=false;render();
+}
+
+init();
+</script>
+</body>
+</html>

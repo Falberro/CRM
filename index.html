@@ -13,17 +13,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 @media(prefers-color-scheme:dark){.topbar{background:#1c1c1a;border-color:rgba(255,255,255,.1)}}
 .topbar-title{font-size:14px;font-weight:500}
 .topbar-sub{font-size:11px;color:#888;margin-top:1px}
-.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;transition:background .3s;vertical-align:middle}
-.status-ok{background:#22c55e}
-.status-loading{background:#f59e0b;animation:pulse 1s infinite}
-.status-error{background:#ef4444}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+.s-ok{background:#22c55e}.s-load{background:#f59e0b;animation:pulse 1s infinite}.s-err{background:#ef4444}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.tabs{background:#fff;border-bottom:0.5px solid rgba(0,0,0,.12);padding:0 16px;display:flex;gap:0;overflow-x:auto}
+.tabs{background:#fff;border-bottom:0.5px solid rgba(0,0,0,.12);padding:0 16px;display:flex;overflow-x:auto}
 @media(prefers-color-scheme:dark){.tabs{background:#1c1c1a;border-color:rgba(255,255,255,.1)}}
 .tab{padding:10px 14px;font-size:12px;font-weight:500;color:#888;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;user-select:none}
 .tab.active{color:#1a1a18;border-color:#3b82f6}
 @media(prefers-color-scheme:dark){.tab.active{color:#e8e8e4}}
-.content{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:920px;margin:0 auto;width:100%}
+.content{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:940px;margin:0 auto;width:100%}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
 .kpi{background:#f9f9f7;border-radius:8px;padding:12px;border:0.5px solid rgba(0,0,0,.1)}
 @media(prefers-color-scheme:dark){.kpi{background:#242422;border-color:rgba(255,255,255,.08)}}
@@ -41,10 +39,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .funnel-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:500;color:#fff;transition:width .5s ease}
 .funnel-count{font-size:12px;font-weight:500;min-width:28px;text-align:right}
 .funnel-conv{font-size:10px;color:#aaa;min-width:40px;text-align:right}
-.prospect-list{display:flex;flex-direction:column;gap:5px;max-height:500px;overflow-y:auto;padding:8px}
-.prospect-row{background:#f9f9f7;border-radius:8px;padding:9px 11px;border:0.5px solid rgba(0,0,0,.08);display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center}
+.prospect-list{display:flex;flex-direction:column;gap:5px;max-height:520px;overflow-y:auto;padding:8px}
+.prospect-row{background:#f9f9f7;border-radius:8px;padding:9px 12px;border:0.5px solid rgba(0,0,0,.08);cursor:pointer;transition:border-color .15s}
+.prospect-row:hover{border-color:rgba(59,130,246,.4)}
 @media(prefers-color-scheme:dark){.prospect-row{background:#242422;border-color:rgba(255,255,255,.06)}}
-@media(max-width:560px){.prospect-row{grid-template-columns:1fr auto auto}}
+.pr-main{display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center}
+.pr-comment{font-size:11px;color:#888;margin-top:5px;padding-top:5px;border-top:0.5px solid rgba(0,0,0,.06);font-style:italic}
+@media(prefers-color-scheme:dark){.pr-comment{border-color:rgba(255,255,255,.06)}}
 .prospect-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prospect-sub{font-size:10px;color:#888;margin-top:1px}
 .badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:500;white-space:nowrap}
@@ -68,14 +69,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .score-fill{height:100%;border-radius:3px}
 .product-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:#f0f9ff;color:#0369a1;border:0.5px solid #bae6fd;white-space:nowrap}
 @media(prefers-color-scheme:dark){.product-tag{background:#0c2a3d;color:#7dd3fc;border-color:#0e4463}}
-.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 8px 0}
 .fsel{font-size:11px;padding:5px 8px;border-radius:6px;border:0.5px solid rgba(0,0,0,.12);background:#f9f9f7;color:#1a1a18;font-family:inherit;cursor:pointer}
 @media(prefers-color-scheme:dark){.fsel{background:#242422;border-color:rgba(255,255,255,.1);color:#e8e8e4}}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 8px 0}
 .alert-warn{background:#fffbeb;border:0.5px solid #fcd34d;border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:9px 13px;font-size:11px;color:#92400e;line-height:1.6}
 @media(prefers-color-scheme:dark){.alert-warn{background:#292116;border-color:#92400e;color:#fde68a}}
+.month-tabs{display:flex;gap:4px;flex-wrap:wrap;padding:8px 14px;border-bottom:0.5px solid rgba(0,0,0,.08)}
+@media(prefers-color-scheme:dark){.month-tabs{border-color:rgba(255,255,255,.06)}}
+.month-tab{font-size:10px;padding:3px 9px;border-radius:20px;border:0.5px solid rgba(0,0,0,.12);background:transparent;cursor:pointer;color:#888;font-family:inherit;transition:all .1s}
+.month-tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.month-tab:hover:not(.active){background:rgba(0,0,0,.04)}
+@media(prefers-color-scheme:dark){.month-tab:hover:not(.active){background:rgba(255,255,255,.05)}}
 .chat-box{background:#fff;border-radius:10px;border:0.5px solid rgba(0,0,0,.1);overflow:hidden;display:flex;flex-direction:column}
 @media(prefers-color-scheme:dark){.chat-box{background:#1c1c1a;border-color:rgba(255,255,255,.08)}}
-.chat-messages{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:160px;max-height:360px;overflow-y:auto}
+.chat-messages{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:160px;max-height:380px;overflow-y:auto}
 .msg{padding:9px 12px;border-radius:8px;font-size:13px;line-height:1.55;max-width:92%;white-space:pre-wrap}
 .msg-user{background:#3b82f6;color:#fff;align-self:flex-end;border-radius:8px 8px 2px 8px}
 .msg-ai{background:#f9f9f7;border:0.5px solid rgba(0,0,0,.08);align-self:flex-start;border-radius:8px 8px 8px 2px;color:#1a1a18}
@@ -92,55 +99,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 @media(prefers-color-scheme:dark){.quick-btn{background:#242422;border-color:rgba(255,255,255,.08);color:#aaa}.quick-btn:hover{background:#2e2e2c}}
 .api-key-box{background:#fff;border-radius:10px;border:0.5px solid rgba(0,0,0,.1);padding:24px;text-align:center}
 @media(prefers-color-scheme:dark){.api-key-box{background:#1c1c1a;border-color:rgba(255,255,255,.08)}}
-.api-key-input{width:100%;max-width:380px;font-size:13px;padding:9px 12px;border-radius:8px;border:0.5px solid rgba(0,0,0,.15);background:#f9f9f7;color:#1a1a18;outline:none;font-family:inherit;margin:12px 0 8px;display:block;margin-left:auto;margin-right:auto;text-align:center}
+.api-key-input{width:100%;max-width:380px;font-size:13px;padding:9px 12px;border-radius:8px;border:0.5px solid rgba(0,0,0,.15);background:#f9f9f7;color:#1a1a18;outline:none;font-family:inherit;margin:12px auto 8px;display:block;text-align:center}
 @media(prefers-color-scheme:dark){.api-key-input{background:#242422;border-color:rgba(255,255,255,.1);color:#e8e8e4}}
 .btn-primary{font-size:12px;padding:8px 18px;border-radius:8px;background:#3b82f6;color:#fff;border:none;cursor:pointer;font-weight:500;font-family:inherit}
+.closed-row{background:#f9f9f7;border-radius:8px;padding:10px 12px;border:0.5px solid rgba(0,0,0,.08);display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center}
+@media(prefers-color-scheme:dark){.closed-row{background:#242422;border-color:rgba(255,255,255,.06)}}
 .mob-hide{display:block}
 @media(max-width:520px){.mob-hide{display:none}}
-.month-tabs{display:flex;gap:4px;flex-wrap:wrap;padding:8px 14px;border-bottom:0.5px solid rgba(0,0,0,.08)}
-@media(prefers-color-scheme:dark){.month-tabs{border-color:rgba(255,255,255,.06)}}
-.month-tab{font-size:10px;padding:3px 9px;border-radius:20px;border:0.5px solid rgba(0,0,0,.12);background:transparent;cursor:pointer;color:#888;font-family:inherit;transition:all .1s}
-.month-tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
-.month-tab:hover:not(.active){background:rgba(0,0,0,.04)}
-@media(prefers-color-scheme:dark){.month-tab:hover:not(.active){background:rgba(255,255,255,.05)}}
-.section-divider{font-size:11px;font-weight:500;color:#888;padding:4px 0 2px;text-transform:uppercase;letter-spacing:.05em}
 </style>
 </head>
 <body>
 <div class="app" id="root"></div>
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
+// ── CONFIG ───────────────────────────────────────────────────────────────────
 const SHEET_ID='1LT2BGviwchlvf3CgKjxIGpt6YZu-YwYCZj394xefcH8';
 const TODAY=new Date();
 const MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+// Columnas A=0 … Q=16
+// A:Nombre B:Relación C:Ubicación D:Ocupación E:Ingreso F:Edad G:Confianza
+// H:FechaC I:FechaR1 J:FechaR2 K:ReunionCierre L:Cierre M:Referidos
+// N:EtapaActual O:ProductoContratado P:MontoContratado Q:Comentario
+
 const INCOME_MAP={'hasta 1M':1,'1M a 2M':2,'2M a 3,5M':3,'3,5M a 6M':4,'más 6M':5};
 const INCOME_LABEL={'hasta 1M':'<1M','1M a 2M':'1–2M','2M a 3,5M':'2–3.5M','3,5M a 6M':'3.5–6M','más 6M':'+6M'};
 
-// ── PRODUCT LOGIC ───────────────────────────────────────────────────────────
-// Fuera de Argentina → IT (siempre)
-// Argentina + edad ≥ 50 → IT/INVIU (inversión de capital)
-// Argentina + edad < 50 + ingreso ≥ 3M → Zurich (plan retiro)
-// Argentina + edad < 50 + ingreso < 3M → Life
+// ── PRODUCT LOGIC ────────────────────────────────────────────────────────────
+// Fuera de Argentina → IT exterior
+// Argentina + edad ≥50 → IT / INVIU
+// Argentina + edad <50 + ingreso ≥3M → Zurich Retiro (foco, mayor comisión)
+// Argentina + edad <50 + ingreso <3M → Life
 function suggestProduct(p){
   const loc=(p.ubicacion||'').toLowerCase().trim();
   const isAbroad=loc!==''&&loc!=='argentina'&&loc!=='arg';
   const inc=INCOME_MAP[p.ingreso]||0;
   const age=p.edad||'';
   const isOld=age.includes('50')||age.includes('60')||age.includes('70');
-
-  if(isAbroad) return {label:'IT exterior',cls:'bp'};
-  if(isOld)    return {label:'IT / INVIU',cls:'bt'};
-  if(inc>=3)   return {label:'Zurich Retiro',cls:'bb'};
-  return       {label:'Life',cls:'bg'};
+  if(isAbroad)          return{label:'IT exterior',cls:'bp'};
+  if(isOld)             return{label:'IT / INVIU',cls:'bt'};
+  if(inc>=3)            return{label:'Zurich Retiro',cls:'bb'};
+  return                      {label:'Life',cls:'bg'};
 }
 
-// ── SCORING ─────────────────────────────────────────────────────────────────
+// ── SCORING (Ingreso 30%, Confianza 25%, Etapa 20%, Temperatura 15%, Relación 10%)
 function relScore(v){
   v=(v||'').toLowerCase();
   if(['madre','padre','hermano','hermana','suegra','suegro','cuñada','cuñado','esposa','esposo'].some(x=>v.includes(x)))return 5;
   if(['amigo','prima','primo','tío','tía','concuñado'].some(x=>v.includes(x)))return 4;
   if(['referido','novia','novio'].some(x=>v.includes(x)))return 3;
-  if(['ex ball','ex quilmes','ex bgh','ex isover','ex unqui','ex alemán','elac','q21'].some(x=>v.includes(x)))return 2;
+  if(['ex ball','ex quilmes','ex bgh','ex isover','ex unqui','elac','q21'].some(x=>v.includes(x)))return 2;
   return 1;
 }
 function stageScore(s){
@@ -162,26 +169,26 @@ function calcScore(p){
   return Math.round((inc*0.30+conf*0.25+stage*0.20+temp*0.15+rel*0.10)*100);
 }
 
-// ── RE-INTENTO LOGIC ────────────────────────────────────────────────────────
+// ── RE-INTENTO ───────────────────────────────────────────────────────────────
 function reintento(p){
   const s=(p.etapa||'').toLowerCase(); const d=p.diasSinActividad;
   if(d===null)return{label:'Sin actividad',cls:'chip-wait'};
   if(s.includes('reunión 2')||s.includes('reunion 2')){
-    if(d<=3)return{label:'Cerrar hoy',cls:'chip-urgent'};
-    if(d<=7)return{label:'Urgente',cls:'chip-urgent'};
+    if(d<=3) return{label:'Cerrar hoy',cls:'chip-urgent'};
+    if(d<=7) return{label:'Urgente',cls:'chip-urgent'};
     if(d<=15)return{label:'Esta semana',cls:'chip-soon'};
     if(d<=30)return{label:'Propuesta alt.',cls:'chip-soon'};
     return{label:'Pausa 60d',cls:'chip-wait'};
   }
   if(s.includes('reunión 1')||s.includes('reunion 1')){
-    if(d<=5)return{label:'Seguimiento',cls:'chip-ok'};
+    if(d<=5) return{label:'Seguimiento',cls:'chip-ok'};
     if(d<=10)return{label:'Propuesta WA',cls:'chip-soon'};
     if(d<=21)return{label:'¿Cambió algo?',cls:'chip-soon'};
     if(d<=45)return{label:'Última llamada',cls:'chip-urgent'};
     return{label:'Pausa 90d',cls:'chip-wait'};
   }
   if(s.includes('solo contactado')){
-    if(d<=7)return{label:'2do intento',cls:'chip-ok'};
+    if(d<=7) return{label:'2do intento',cls:'chip-ok'};
     if(d<=14)return{label:'3er intento',cls:'chip-soon'};
     if(d<=21)return{label:'Último intento',cls:'chip-urgent'};
     return{label:'Archivar',cls:'chip-wait'};
@@ -209,24 +216,18 @@ function tempBadge(p){
   return{label:'Pendiente',cls:'bgr'};
 }
 
-// ── DATE PARSING ─────────────────────────────────────────────────────────────
+// ── DATE / CSV ────────────────────────────────────────────────────────────────
 function parseDate(v){
   if(!v)return null;
   const s=String(v).trim();
   if(!s||s.length<4)return null;
-  if(/^\d{5,6}$/.test(s)){const n=parseInt(s);if(n>40000&&n<60000)return new Date((n-25569)*86400*1000);}
-  const parts=s.split('/');
-  if(parts.length===3){
-    let d=parseInt(parts[0]),m=parseInt(parts[1]),y=parseInt(parts[2]);
-    if(y<100)y+=2000;
-    if(y<1990||y>2100)return null;
-    return new Date(y,m-1,d);
-  }
-  const d=new Date(s); return isNaN(d)?null:d;
+  if(/^\d{5}$/.test(s)){const n=parseInt(s);if(n>40000&&n<60000)return new Date((n-25569)*86400*1000);}
+  const p=s.split('/');
+  if(p.length===3){let d=parseInt(p[0]),m=parseInt(p[1]),y=parseInt(p[2]);if(y<100)y+=2000;if(y<1990||y>2100)return null;return new Date(y,m-1,d);}
+  const d=new Date(s);return isNaN(d)?null:d;
 }
 function daysSince(d){if(!d)return null;return Math.floor((TODAY-d)/86400000);}
 
-// ── CSV PARSING ──────────────────────────────────────────────────────────────
 function parseCSV(text){
   const lines=text.trim().split('\n');
   const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
@@ -243,13 +244,14 @@ function parseCSV(text){
     return obj;
   });
 }
+
 function normalizeRow(r){
-  const nombre=r['Nombre']||r['nombre']||'';
+  const nombre=r['Nombre']||'';
   if(!nombre||nombre.toLowerCase()==='nombre')return null;
   const fechaC=parseDate(r['Primer contacto fecha']);
   const fechaR1=parseDate(r['Reunión 1 fecha']||r['Reunion 1 fecha']);
   const fechaR2=parseDate(r['Reunión 2 fecha']||r['Reunion 2 fecha']);
-  const fechaR3=parseDate(r['Reunión 3']||r['Reunion 3']);
+  const fechaRC=parseDate(r['Reunión de cierre']||r['Reunión 3']||r['Reunion 3']);
   const fechaCierre=parseDate(r['Cierre']);
   const etapa=r['Etapa Actual']||r['etapa actual']||'';
   const esCerrado=etapa.toLowerCase().includes('cerrado')||etapa.toLowerCase().includes('ganado')||!!fechaCierre;
@@ -258,13 +260,17 @@ function normalizeRow(r){
   const p={
     nombre,
     relacion:r['Relación']||r['Relacion']||'',
-    ubicacion:r['Ubicación']||r['Ubicacion']||r['Pais']||r['País']||'',
+    ubicacion:r['Ubicación']||r['Ubicacion']||'',
     ocupacion:r['Ocupación']||r['Ocupacion']||'',
     ingreso:r['Ingreso estimado']||'',
     edad:r['Edad']||'',
     confianza:r['Confianza']||'',
-    etapa,referidos:r['Referidos']||'',
-    fechaC,fechaR1,fechaR2,fechaR3,fechaCierre,
+    etapa,
+    referidos:r['Referidos']||'',
+    comentario:r['Comentario']||r['Comentarios']||'',
+    productoContratado:r['Producto contratado']||'',
+    montoContratado:r['Monto contratado']||r['Monto anual contratado']||'',
+    fechaC,fechaR1,fechaR2,fechaRC,fechaCierre,
     diasSinActividad,esCerrado
   };
   p.score=calcScore(p);
@@ -274,123 +280,100 @@ function normalizeRow(r){
   return p;
 }
 
-// ── STATE ────────────────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────────────────
 let allProspects=[];
-let chatMessages=[{role:'ai',text:'Hola. Soy tu director comercial IA. Tengo acceso a tu pipeline en tiempo real.\n\nPodés preguntarme:\n• ¿A quién llamo hoy?\n• ¿Cómo avanzo con [nombre]?\n• ¿Qué producto le propongo a alguien de 45 años en Argentina que gana 4M?\n• Análisis del embudo de este mes'}];
+let chatMessages=[{role:'ai',text:'Hola. Soy tu director comercial IA.\n\nTengo acceso en tiempo real a tu pipeline. Podés preguntarme:\n• ¿A quién llamo hoy?\n• ¿Cómo avanzo con [nombre]?\n• ¿Cuál es el mejor prospecto para Zurich esta semana?\n• Análisis del embudo de este mes'}];
 let currentTab='pipeline';
 let filterStage='all';
 let filterScore='all';
-let selectedMonth='all'; // 'all' or 'YYYY-M'
+let selectedMonth='all';
 let chatLoading=false;
 let dataStatus='loading';
 let apiKey=localStorage.getItem('crm_api_key')||'';
 let loadedAt=null;
 
-// ── FETCH DATA ────────────────────────────────────────────────────────────────
+// ── FETCH ─────────────────────────────────────────────────────────────────────
 async function fetchData(){
   const urls=[
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`,
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`,
   ];
   for(const url of urls){
-    try{
-      const r=await fetch(url,{cache:'no-store'});
-      if(r.ok){const t=await r.text();if(t.includes('Nombre')||t.includes('nombre'))return t;}
-    }catch(e){}
+    try{const r=await fetch(url,{cache:'no-store'});if(r.ok){const t=await r.text();if(t.includes('Nombre'))return t;}}catch(e){}
   }
   return null;
 }
 
-// ── FUNNEL FOR A GIVEN PROSPECT SET ──────────────────────────────────────────
-function funnelStats(prospects){
-  const total=prospects.length;
-  const contactados=prospects.filter(p=>p.fechaC).length;
-  const r1=prospects.filter(p=>p.fechaR1).length;
-  const r2=prospects.filter(p=>p.fechaR2).length;
-  const cerrados=prospects.filter(p=>p.esCerrado).length;
-  return{total,contactados,r1,r2,cerrados};
-}
-
-// ── AVAILABLE MONTHS (from fechaC) ───────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 function availableMonths(){
   const seen=new Set();
   allProspects.forEach(p=>{
-    if(p.fechaC){
-      const key=`${p.fechaC.getFullYear()}-${p.fechaC.getMonth()}`;
-      seen.add(key);
-    }
+    [p.fechaC,p.fechaR1,p.fechaR2,p.fechaRC,p.fechaCierre].forEach(d=>{
+      if(d)seen.add(`${d.getFullYear()}-${d.getMonth()}`);
+    });
   });
   return Array.from(seen).sort();
 }
-
-function monthLabel(key){
-  const [y,m]=key.split('-').map(Number);
-  return `${MONTHS[m]} ${y}`;
-}
-
+function monthLabel(key){const[y,m]=key.split('-').map(Number);return`${MONTHS[m]} ${y}`;}
 function prospectsForMonth(key){
   if(key==='all')return allProspects;
-  const [y,m]=key.split('-').map(Number);
-  // Include prospect if any activity happened in that month
-  return allProspects.filter(p=>{
-    const dates=[p.fechaC,p.fechaR1,p.fechaR2,p.fechaR3,p.fechaCierre].filter(Boolean);
-    return dates.some(d=>d.getFullYear()===y&&d.getMonth()===m);
-  });
+  const[y,m]=key.split('-').map(Number);
+  return allProspects.filter(p=>[p.fechaC,p.fechaR1,p.fechaR2,p.fechaRC,p.fechaCierre].some(d=>d&&d.getFullYear()===y&&d.getMonth()===m));
+}
+function funnelStats(list){
+  return{
+    total:list.length,
+    contactados:list.filter(p=>p.fechaC).length,
+    r1:list.filter(p=>p.fechaR1).length,
+    r2:list.filter(p=>p.fechaR2).length,
+    cerrados:list.filter(p=>p.esCerrado).length,
+  };
+}
+function formatMonto(v){
+  if(!v)return'';
+  const n=parseFloat(String(v).replace(/[^0-9.]/g,''));
+  if(isNaN(n))return v;
+  if(n>=1000000)return'$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000)return'$'+(n/1000).toFixed(0)+'k';
+  return'$'+n;
 }
 
-// ── DOM HELPERS ───────────────────────────────────────────────────────────────
+// ── DOM ───────────────────────────────────────────────────────────────────────
 function el(tag,props={},children=[]){
   const e=document.createElement(tag);
   Object.entries(props).forEach(([k,v])=>{
     if(k==='className')e.className=v;
     else if(k==='style'&&typeof v==='object')Object.assign(e.style,v);
     else if(k.startsWith('on'))e[k]=v;
-    else if(k==='html'){e.innerHTML=v;return;}
     else e.setAttribute(k,v);
   });
-  children.forEach(c=>{
-    if(c==null)return;
-    if(typeof c==='string')e.appendChild(document.createTextNode(c));
-    else e.appendChild(c);
-  });
+  children.forEach(c=>{if(c==null)return;typeof c==='string'?e.appendChild(document.createTextNode(c)):e.appendChild(c);});
   return e;
 }
-function txt(s){return document.createTextNode(s);}
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render(){
   const root=document.getElementById('root');
   root.innerHTML='';
-
   const timeStr=loadedAt?loadedAt.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';
-  const statusText=
-    dataStatus==='ok'?`Sheets conectado · ${timeStr}`:
-    dataStatus==='error'?'Publicá el Sheet desde Archivo → Publicar en la web (CSV)':
-    'Conectando con Google Sheets...';
-  const dotCls=dataStatus==='ok'?'status-ok':dataStatus==='error'?'status-error':'status-loading';
+  const statusText=dataStatus==='ok'?`Sheets conectado · ${timeStr}`:dataStatus==='error'?'Publicá el Sheet: Archivo → Publicar en la web (CSV)':'Conectando...';
+  const dotCls=dataStatus==='ok'?'s-ok':dataStatus==='error'?'s-err':'s-load';
 
   // TOPBAR
-  const topbar=el('div',{className:'topbar'},[
+  root.appendChild(el('div',{className:'topbar'},[
     el('div',{},[
-      el('div',{className:'topbar-title'},[
-        el('span',{className:'status-dot '+dotCls}),
-        'CRM — Asesoría Financiera'
-      ]),
+      el('div',{className:'topbar-title'},[el('span',{className:'status-dot '+dotCls}),'CRM — Asesoría Financiera']),
       el('div',{className:'topbar-sub'},[statusText])
     ]),
     el('div',{style:{textAlign:'right',fontSize:'11px',color:'#888',display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'3px'}},[
       el('div',{},[`${allProspects.length} prospectos · ${allProspects.filter(p=>p.esCerrado).length} cerrados`]),
-      el('button',{
-        style:{fontSize:'10px',padding:'3px 9px',borderRadius:'5px',border:'0.5px solid rgba(0,0,0,.15)',background:'transparent',cursor:'pointer',fontFamily:'inherit',color:'inherit'},
-        onclick:()=>init()
-      },['↺ Actualizar'])
+      el('button',{style:{fontSize:'10px',padding:'3px 9px',borderRadius:'5px',border:'0.5px solid rgba(0,0,0,.15)',background:'transparent',cursor:'pointer',fontFamily:'inherit',color:'inherit'},onclick:()=>init()},['↺ Actualizar'])
     ])
-  ]);
-  root.appendChild(topbar);
+  ]));
 
   // TABS
   const tabs=el('div',{className:'tabs'});
-  [['pipeline','Pipeline'],['score','Prioridad'],['nuevos','Nuevos Contactos'],['chat','Chat IA']].forEach(([id,label])=>{
+  [['pipeline','Pipeline'],['score','Prioridad'],['nuevos','Nuevos Contactos'],['cerrados','Cerrados'],['chat','Chat IA']].forEach(([id,label])=>{
     tabs.appendChild(el('div',{className:'tab'+(currentTab===id?' active':''),onclick:()=>{currentTab=id;render();}},[label]));
   });
   root.appendChild(tabs);
@@ -398,91 +381,55 @@ function render(){
   const content=el('div',{className:'content'});
   root.appendChild(content);
 
-  // ── PIPELINE TAB ────────────────────────────────────────────────────────────
+  const activos=allProspects.filter(p=>p.fechaC&&!p.esCerrado);
+  const cerrados=allProspects.filter(p=>p.esCerrado);
+
+  // ── PIPELINE ────────────────────────────────────────────────────────────────
   if(currentTab==='pipeline'){
     const months=availableMonths();
     const filtered=prospectsForMonth(selectedMonth);
     const stats=funnelStats(filtered);
-    const activos=filtered.filter(p=>p.fechaC&&!p.esCerrado);
+    const activosFiltrados=filtered.filter(p=>p.fechaC&&!p.esCerrado);
 
     // KPIs
-    const kgrid=el('div',{className:'kpi-grid'});
-    const kpiDefs=[
-      {val:stats.total,label:'Universo',sub:selectedMonth==='all'?'BD total':'en este mes',color:''},
-      {val:stats.contactados,label:'Contactados',sub:stats.total?Math.round(stats.contactados/stats.total*100)+'% del total':'',color:'#f59e0b'},
-      {val:stats.r1,label:'Reunión 1',sub:stats.contactados?Math.round(stats.r1/stats.contactados*100)+'% conv.':'',color:'#3b82f6'},
-      {val:stats.r2,label:'Reunión 2',sub:stats.r1?Math.round(stats.r2/stats.r1*100)+'% conv.':'',color:'#8b5cf6'},
-      {val:stats.cerrados,label:'Cerrados',sub:stats.contactados?Math.round(stats.cerrados/stats.contactados*100)+'% global':'',color:'#22c55e'},
-      {val:activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 2')).length,label:'En R2 ahora',sub:'próximos a cerrar',color:'#ef4444'},
-    ];
-    kpiDefs.forEach(k=>{
-      kgrid.appendChild(el('div',{className:'kpi'},[
-        el('div',{className:'kpi-val',style:{color:k.color||'inherit'}},[String(k.val)]),
-        el('div',{className:'kpi-label'},[k.label]),
-        el('div',{className:'kpi-sub'},[k.sub])
-      ]));
+    const kg=el('div',{className:'kpi-grid'});
+    [{val:stats.total,label:'Universo',sub:selectedMonth==='all'?'BD total':'en este período',color:''},{val:stats.contactados,label:'Contactados',sub:stats.total?Math.round(stats.contactados/stats.total*100)+'% del total':'',color:'#f59e0b'},{val:stats.r1,label:'Reunión 1',sub:stats.contactados?Math.round(stats.r1/stats.contactados*100)+'% conv.':'',color:'#3b82f6'},{val:stats.r2,label:'Reunión 2',sub:stats.r1?Math.round(stats.r2/stats.r1*100)+'% conv.':'',color:'#8b5cf6'},{val:stats.cerrados,label:'Cerrados',sub:stats.contactados?Math.round(stats.cerrados/stats.contactados*100)+'% global':'',color:'#22c55e'},{val:activosFiltrados.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 2')).length,label:'En R2 ahora',sub:'próximos a cerrar',color:'#ef4444'}].forEach(k=>{
+      kg.appendChild(el('div',{className:'kpi'},[el('div',{className:'kpi-val',style:{color:k.color||'inherit'}},[String(k.val)]),el('div',{className:'kpi-label'},[k.label]),el('div',{className:'kpi-sub'},[k.sub])]));
     });
-    content.appendChild(kgrid);
+    content.appendChild(kg);
 
-    // FUNNEL CARD
+    // FUNNEL
     const fc=el('div',{className:'card'});
-
-    // Month selector inside funnel
-    const mts=el('div',{className:'month-tabs'});
-    const allBtn=el('button',{className:'month-tab'+(selectedMonth==='all'?' active':''),onclick:()=>{selectedMonth='all';render();}},[' Todo']);
-    mts.appendChild(allBtn);
-    months.forEach(key=>{
-      mts.appendChild(el('button',{className:'month-tab'+(selectedMonth===key?' active':''),onclick:()=>{selectedMonth=key;render();}},[monthLabel(key)]));
-    });
     fc.appendChild(el('div',{className:'card-header'},['Embudo comercial']));
+    const mts=el('div',{className:'month-tabs'});
+    mts.appendChild(el('button',{className:'month-tab'+(selectedMonth==='all'?' active':''),onclick:()=>{selectedMonth='all';render();}},[' Todo']));
+    months.forEach(key=>mts.appendChild(el('button',{className:'month-tab'+(selectedMonth===key?' active':''),onclick:()=>{selectedMonth=key;render();}},[monthLabel(key)])));
     fc.appendChild(mts);
-
     const fb=el('div',{style:{padding:'12px 14px'}});
-    const funnelDefs=[
-      {label:'Contactados',n:stats.contactados,color:'#f59e0b',prev:stats.total},
-      {label:'Reunión 1',n:stats.r1,color:'#3b82f6',prev:stats.contactados},
-      {label:'Reunión 2',n:stats.r2,color:'#8b5cf6',prev:stats.r1},
-      {label:'Cerrados',n:stats.cerrados,color:'#22c55e',prev:stats.r2},
-    ];
     const base=stats.contactados||1;
-    funnelDefs.forEach(s=>{
-      const pct=Math.max(Math.round(s.n/base*100),s.n>0?4:0);
+    [{label:'Contactados',n:stats.contactados,color:'#f59e0b',prev:stats.total},{label:'Reunión 1',n:stats.r1,color:'#3b82f6',prev:stats.contactados},{label:'Reunión 2',n:stats.r2,color:'#8b5cf6',prev:stats.r1},{label:'Cerrados',n:stats.cerrados,color:'#22c55e',prev:stats.r2}].forEach(s=>{
+      const pct=Math.min(Math.max(Math.round(s.n/base*100),s.n>0?4:0),100);
       const conv=s.prev?Math.round(s.n/s.prev*100)+'%':'—';
-      fb.appendChild(el('div',{className:'funnel-bar'},[
-        el('span',{className:'funnel-label'},[s.label]),
-        el('div',{className:'funnel-track'},[
-          el('div',{className:'funnel-fill',style:{width:Math.min(pct,100)+'%',background:s.color}},[s.n>0?String(s.n):''])
-        ]),
-        el('span',{className:'funnel-count'},[String(s.n)]),
-        el('span',{className:'funnel-conv'},[conv])
-      ]));
+      fb.appendChild(el('div',{className:'funnel-bar'},[el('span',{className:'funnel-label'},[s.label]),el('div',{className:'funnel-track'},[el('div',{className:'funnel-fill',style:{width:pct+'%',background:s.color}},[s.n>0?String(s.n):''])]),el('span',{className:'funnel-count'},[String(s.n)]),el('span',{className:'funnel-conv'},[conv])]));
     });
     fc.appendChild(fb);content.appendChild(fc);
 
     // ALERT
     const urgentes=activos.filter(p=>p.reintentoInfo.cls==='chip-urgent').length;
-    if(urgentes>0){
-      content.appendChild(el('div',{className:'alert-warn'},[
-        `⚡ ${urgentes} prospecto${urgentes>1?'s requieren':'requiere'} acción urgente hoy. Ver pestaña Prioridad.`
-      ]));
-    }
+    if(urgentes>0)content.appendChild(el('div',{className:'alert-warn'},[`⚡ ${urgentes} prospecto${urgentes>1?'s requieren':'requiere'} acción urgente hoy. Ver pestaña Prioridad.`]));
 
-    // PROSPECT LIST
+    // LIST
     const pc=el('div',{className:'card'});
     pc.appendChild(el('div',{className:'card-header'},['Prospectos activos']));
-
     const frow=el('div',{className:'filter-row'});
     const s1=el('select',{className:'fsel',onchange:e=>{filterStage=e.target.value;render();}});
-    [['all','Todas las etapas'],['Reunión 2','En Reunión 2'],['Reunión 1','En Reunión 1'],['Solo Contactado','Solo contactados']].forEach(([v,l])=>{
-      const o=el('option',{value:v},[l]);if(v===filterStage)o.selected=true;s1.appendChild(o);
-    });
+    [['all','Todas las etapas'],['Reunión 2','En R2'],['Reunión 1','En R1'],['Solo Contactado','Solo contactados']].forEach(([v,l])=>{const o=el('option',{value:v},[l]);if(v===filterStage)o.selected=true;s1.appendChild(o);});
     const s2=el('select',{className:'fsel',onchange:e=>{filterScore=e.target.value;render();}});
-    [['all','Todos los scores'],['high','Score > 60'],['mid','Score 40–60'],['low','Score < 40']].forEach(([v,l])=>{
-      const o=el('option',{value:v},[l]);if(v===filterScore)o.selected=true;s2.appendChild(o);
-    });
+    [['all','Todos los scores'],['high','Score > 60'],['mid','Score 40–60'],['low','Score < 40']].forEach(([v,l])=>{const o=el('option',{value:v},[l]);if(v===filterScore)o.selected=true;s2.appendChild(o);});
     frow.appendChild(s1);frow.appendChild(s2);
     pc.appendChild(frow);
 
+    const list=el('div',{className:'prospect-list'});
     let prosp=activos.filter(p=>{
       if(filterStage!=='all'&&!(p.etapa||'').toLowerCase().includes(filterStage.toLowerCase()))return false;
       if(filterScore==='high'&&p.score<60)return false;
@@ -491,20 +438,14 @@ function render(){
       return true;
     }).sort((a,b)=>b.score-a.score);
 
-    const list=el('div',{className:'prospect-list'});
-    if(prosp.length===0){
-      list.appendChild(el('div',{style:{textAlign:'center',color:'#888',padding:'24px',fontSize:'12px'}},['Sin prospectos con esos filtros']));
-    }
+    if(!prosp.length)list.appendChild(el('div',{style:{textAlign:'center',color:'#888',padding:'24px',fontSize:'12px'}},['Sin prospectos con esos filtros']));
     prosp.forEach(p=>{
       const sc=p.score>=70?'#22c55e':p.score>=45?'#f59e0b':'#ef4444';
-      list.appendChild(el('div',{className:'prospect-row'},[
+      const row=el('div',{className:'prospect-row'});
+      const main=el('div',{className:'pr-main'},[
         el('div',{},[
           el('div',{className:'prospect-name'},[p.nombre]),
-          el('div',{className:'prospect-sub'},[
-            p.relacion+(p.ingreso?' · '+(INCOME_LABEL[p.ingreso]||p.ingreso):'')
-            +' · conf.'+(p.confianza||'?')
-            +(p.diasSinActividad!==null?' · '+p.diasSinActividad+'d':'')
-          ])
+          el('div',{className:'prospect-sub'},[p.relacion+(p.ingreso?' · '+(INCOME_LABEL[p.ingreso]||p.ingreso):'')+' · conf.'+(p.confianza||'?')+(p.diasSinActividad!=null?' · '+p.diasSinActividad+'d':'')])
         ]),
         el('span',{className:'badge '+p.tempInfo.cls},[p.tempInfo.label]),
         el('span',{className:'chip '+p.reintentoInfo.cls},[p.reintentoInfo.label]),
@@ -513,34 +454,32 @@ function render(){
           el('div',{style:{fontSize:'12px',fontWeight:'500',color:sc}},[String(p.score)]),
           el('div',{className:'score-bar'},[el('div',{className:'score-fill',style:{width:p.score+'%',background:sc}})])
         ])
-      ]));
+      ]);
+      row.appendChild(main);
+      if(p.comentario){
+        row.appendChild(el('div',{className:'pr-comment'},['💬 '+p.comentario]));
+      }
+      list.appendChild(row);
     });
-    pc.appendChild(list);
-    content.appendChild(pc);
+    pc.appendChild(list);content.appendChild(pc);
   }
 
-  // ── PRIORIDAD TAB ───────────────────────────────────────────────────────────
+  // ── PRIORIDAD ───────────────────────────────────────────────────────────────
   else if(currentTab==='score'){
     const ranked=allProspects.filter(p=>!p.esCerrado&&p.fechaC).sort((a,b)=>b.score-a.score);
     const sc=el('div',{className:'card'});
     sc.appendChild(el('div',{className:'card-header'},[
-      'Top prospectos activos por score  ',
+      'Top prospectos activos  ',
       el('span',{style:{fontSize:'10px',fontWeight:'400',color:'#888'}},['Ingreso 30% · Confianza 25% · Etapa 20% · Temperatura 15% · Relación 10%'])
     ]));
     const sl=el('div',{className:'prospect-list'});
     ranked.slice(0,30).forEach((p,i)=>{
       const scCol=p.score>=70?'#22c55e':p.score>=45?'#f59e0b':'#ef4444';
-      sl.appendChild(el('div',{className:'prospect-row'},[
+      const row=el('div',{className:'prospect-row'});
+      const main=el('div',{className:'pr-main'},[
         el('div',{},[
-          el('div',{className:'prospect-name'},[
-            el('span',{style:{color:'#aaa',marginRight:'5px',fontSize:'11px'}},['#'+(i+1)]),
-            p.nombre
-          ]),
-          el('div',{className:'prospect-sub'},[
-            p.relacion+' · '+(p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'sin ingreso')
-            +' · conf.'+(p.confianza||'?')
-            +(p.ubicacion&&p.ubicacion.toLowerCase()!=='argentina'&&p.ubicacion?` · ${p.ubicacion}`:'')
-          ])
+          el('div',{className:'prospect-name'},[el('span',{style:{color:'#aaa',marginRight:'5px',fontSize:'11px'}},['#'+(i+1)]),p.nombre]),
+          el('div',{className:'prospect-sub'},[p.relacion+' · '+(p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'sin ingreso')+' · conf.'+(p.confianza||'?')+(p.ubicacion&&p.ubicacion.toLowerCase()!=='argentina'?` · ${p.ubicacion}`:'')])
         ]),
         el('span',{className:'badge '+p.tempInfo.cls},[p.tempInfo.label]),
         el('span',{className:'chip '+p.reintentoInfo.cls},[p.reintentoInfo.label]),
@@ -549,83 +488,96 @@ function render(){
           el('div',{style:{fontSize:'13px',fontWeight:'500',color:scCol}},[String(p.score)]),
           el('div',{className:'score-bar'},[el('div',{className:'score-fill',style:{width:p.score+'%',background:scCol}})])
         ])
-      ]));
+      ]);
+      row.appendChild(main);
+      if(p.comentario)row.appendChild(el('div',{className:'pr-comment'},['💬 '+p.comentario]));
+      sl.appendChild(row);
     });
     sc.appendChild(sl);content.appendChild(sc);
   }
 
-  // ── NUEVOS CONTACTOS TAB ────────────────────────────────────────────────────
+  // ── NUEVOS CONTACTOS ────────────────────────────────────────────────────────
   else if(currentTab==='nuevos'){
     const sinContactar=allProspects.filter(p=>!p.fechaC&&!p.esCerrado).sort((a,b)=>b.score-a.score);
     const byGroup={};
     sinContactar.forEach(p=>{
       const rel=(p.relacion||'').toLowerCase();
-      const g=
-        rel.includes('ex quilmes')?'Ex Quilmes':
-        rel.includes('ex ball')?'Ex Ball':
-        rel.includes('ex bgh')?'Ex BGH':
-        rel.includes('elac')?'ELAC':
-        (rel.includes('ex ')||rel.includes('q21'))?'Otros ex-colegas':
-        'Familia, amigos y referidos';
+      const g=rel.includes('ex quilmes')?'Ex Quilmes':rel.includes('ex ball')?'Ex Ball':rel.includes('ex bgh')?'Ex BGH':rel.includes('elac')?'ELAC':(rel.includes('ex ')||rel.includes('q21'))?'Otros ex-colegas':'Familia, amigos y referidos';
       if(!byGroup[g])byGroup[g]=[];
       byGroup[g].push(p);
     });
-    const order=['Familia, amigos y referidos','Ex Ball','Ex Quilmes','Ex BGH','ELAC','Otros ex-colegas'];
-    let hasAny=false;
-    order.filter(g=>byGroup[g]).forEach(grp=>{
-      hasAny=true;
-      const prospects=byGroup[grp].slice(0,12);
+    ['Familia, amigos y referidos','Ex Ball','Ex Quilmes','Ex BGH','ELAC','Otros ex-colegas'].filter(g=>byGroup[g]).forEach(grp=>{
       const gc=el('div',{className:'card'});
-      gc.appendChild(el('div',{className:'card-header'},[
-        grp,
-        el('span',{style:{fontSize:'10px',fontWeight:'400',color:'#888'}},['  '+byGroup[grp].length+' sin contactar'])
-      ]));
+      gc.appendChild(el('div',{className:'card-header'},[grp,el('span',{style:{fontSize:'10px',fontWeight:'400',color:'#888'}},['  '+byGroup[grp].length+' sin contactar'])]));
       const gl=el('div',{className:'prospect-list'});
-      prospects.forEach(p=>{
+      byGroup[grp].slice(0,12).forEach(p=>{
         const scCol=p.score>=55?'#22c55e':p.score>=35?'#f59e0b':'#9ca3af';
-        gl.appendChild(el('div',{className:'prospect-row'},[
+        const row=el('div',{className:'prospect-row'});
+        const main=el('div',{className:'pr-main'},[
           el('div',{},[
             el('div',{className:'prospect-name'},[p.nombre]),
-            el('div',{className:'prospect-sub'},[
-              (p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'sin ingreso')
-              +' · '+(p.ocupacion||'—')+' · '+(p.edad||'—')
-              +(p.ubicacion&&p.ubicacion.toLowerCase()!=='argentina'&&p.ubicacion?' 🌍 '+p.ubicacion:'')
-            ])
+            el('div',{className:'prospect-sub'},[(p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'sin ingreso')+' · '+(p.ocupacion||'—')+' · '+(p.edad||'—')+(p.ubicacion&&p.ubicacion.toLowerCase()!=='argentina'&&p.ubicacion?' 🌍 '+p.ubicacion:'')])
           ]),
           el('span',{style:{fontSize:'10px',color:'#888',whiteSpace:'nowrap'}},['conf. '+(p.confianza||'?')]),
           el('span',{className:'chip chip-ok mob-hide'},['Contactar']),
           el('span',{className:'product-tag mob-hide'},[p.producto.label]),
-          el('div',{style:{textAlign:'right',minWidth:'30px'}},[
-            el('div',{style:{fontSize:'12px',fontWeight:'500',color:scCol}},[String(p.score)])
-          ])
-        ]));
+          el('div',{style:{textAlign:'right',minWidth:'30px'}},[el('div',{style:{fontSize:'12px',fontWeight:'500',color:scCol}},[String(p.score)])])
+        ]);
+        row.appendChild(main);
+        if(p.comentario)row.appendChild(el('div',{className:'pr-comment'},['💬 '+p.comentario]));
+        gl.appendChild(row);
       });
       gc.appendChild(gl);content.appendChild(gc);
     });
-    if(!hasAny){
-      content.appendChild(el('div',{style:{textAlign:'center',color:'#888',padding:'40px',fontSize:'13px'}},['No hay prospectos sin contactar en la BD.']));
-    }
+    if(!Object.keys(byGroup).length)content.appendChild(el('div',{style:{textAlign:'center',color:'#888',padding:'40px',fontSize:'13px'}},['No hay prospectos sin contactar.']));
   }
 
-  // ── CHAT IA TAB ─────────────────────────────────────────────────────────────
+  // ── CERRADOS ────────────────────────────────────────────────────────────────
+  else if(currentTab==='cerrados'){
+    const totalMonto=cerrados.reduce((sum,p)=>{const n=parseFloat(String(p.montoContratado).replace(/[^0-9.]/g,''));return sum+(isNaN(n)?0:n);},0);
+
+    // KPIs cerrados
+    const kg=el('div',{className:'kpi-grid'});
+    [{val:cerrados.length,label:'Total cerrados',sub:'clientes activos',color:'#22c55e'},{val:cerrados.filter(p=>p.productoContratado).length,label:'Con producto',sub:'registrado',color:'#3b82f6'},{val:totalMonto>0?formatMonto(totalMonto):'—',label:'Monto total',sub:'anual contratado',color:'#8b5cf6'}].forEach(k=>{
+      kg.appendChild(el('div',{className:'kpi'},[el('div',{className:'kpi-val',style:{color:k.color||'inherit'}},[String(k.val)]),el('div',{className:'kpi-label'},[k.label]),el('div',{className:'kpi-sub'},[k.sub])]));
+    });
+    content.appendChild(kg);
+
+    const cc=el('div',{className:'card'});
+    cc.appendChild(el('div',{className:'card-header'},['Clientes cerrados']));
+    const cl=el('div',{className:'prospect-list'});
+    cerrados.sort((a,b)=>(b.fechaCierre||0)-(a.fechaCierre||0)).forEach(p=>{
+      const row=el('div',{className:'closed-row'});
+      row.appendChild(el('div',{},[
+        el('div',{className:'prospect-name'},[p.nombre]),
+        el('div',{className:'prospect-sub'},[
+          p.relacion+' · '+(p.ingreso?INCOME_LABEL[p.ingreso]||p.ingreso:'—')
+          +(p.fechaCierre?' · '+p.fechaCierre.toLocaleDateString('es-AR'):'')
+        ])
+      ]));
+      row.appendChild(el('span',{className:'product-tag'},[p.productoContratado||p.producto.label]));
+      row.appendChild(el('div',{style:{fontSize:'12px',fontWeight:'500',color:'#22c55e',textAlign:'right'}},[formatMonto(p.montoContratado)||'—']));
+      row.appendChild(el('span',{className:'badge bg'},['Cerrado']));
+      cl.appendChild(row);
+    });
+    if(!cerrados.length)cl.appendChild(el('div',{style:{textAlign:'center',color:'#888',padding:'24px',fontSize:'12px'}},['Aún no hay cierres registrados.']));
+    cc.appendChild(cl);content.appendChild(cc);
+  }
+
+  // ── CHAT IA ─────────────────────────────────────────────────────────────────
   else if(currentTab==='chat'){
     if(!apiKey){
       const box=el('div',{className:'api-key-box'});
       box.innerHTML=`
-        <div style="font-size:16px;font-weight:500;margin-bottom:8px">Configurar Chat con IA</div>
+        <div style="font-size:16px;font-weight:500;margin-bottom:8px">Configurar Chat IA</div>
         <div style="font-size:12px;color:#888;max-width:380px;margin:0 auto;line-height:1.7">
-          Para usar el análisis con Claude necesitás una API key de Anthropic.<br>
-          Es gratuita hasta cierto uso mensual.<br><br>
-          <a href="https://console.anthropic.com/keys" target="_blank" style="color:#3b82f6;font-weight:500">Obtener API key en console.anthropic.com →</a>
+          Necesitás una API key de Anthropic para usar el chat.<br>
+          <a href="https://console.anthropic.com/keys" target="_blank" style="color:#3b82f6;font-weight:500">Obtener API key →</a>
         </div>
         <input class="api-key-input" type="password" id="api-key-inp" placeholder="sk-ant-api03-..." />
-        <br>
-        <button class="btn-primary" onclick="saveKey()">Guardar y continuar</button>
-        <div style="font-size:10px;color:#aaa;margin-top:10px;max-width:340px;margin-left:auto;margin-right:auto">
-          La clave se guarda solo en tu navegador (localStorage).<br>No pasa por ningún servidor externo.
-        </div>`;
-      content.appendChild(box);
-      return;
+        <br><button class="btn-primary" onclick="saveKey()">Guardar y continuar</button>
+        <div style="font-size:10px;color:#aaa;margin-top:10px">La clave se guarda solo en tu navegador.</div>`;
+      content.appendChild(box);return;
     }
 
     const chatCard=el('div',{className:'chat-box'});
@@ -638,14 +590,7 @@ function render(){
     chatCard.appendChild(msgs);
 
     const quick=el('div',{className:'quick-btns'});
-    [
-      '¿A quién llamo hoy?',
-      'Top 5 para cerrar esta semana',
-      '¿Qué hago con los prospectos fríos?',
-      'Análisis del embudo',
-      '¿Cuál es mi mejor segmento?',
-      'Familia sin contactar'
-    ].forEach(q=>{
+    ['¿A quién llamo hoy?','Top 5 para cerrar esta semana','Análisis del embudo','¿Quiénes son candidatos a Zurich?','¿Qué hago con los prospectos fríos?','Familia sin contactar'].forEach(q=>{
       quick.appendChild(el('button',{className:'quick-btn',onclick:()=>sendChat(q)},[q]));
     });
     chatCard.appendChild(quick);
@@ -659,23 +604,20 @@ function render(){
     chatCard.appendChild(inputRow);
 
     const footer=el('div',{style:{padding:'4px 8px 8px',display:'flex',justifyContent:'flex-end'}});
-    footer.appendChild(el('button',{
-      style:{fontSize:'10px',color:'#aaa',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'},
-      onclick:()=>{apiKey='';localStorage.removeItem('crm_api_key');render();}
-    },['Cambiar API key']));
+    footer.appendChild(el('button',{style:{fontSize:'10px',color:'#aaa',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'},onclick:()=>{apiKey='';localStorage.removeItem('crm_api_key');render();}},['Cambiar API key']));
     chatCard.appendChild(footer);
     content.appendChild(chatCard);
     setTimeout(()=>{const m=document.getElementById('chat-msgs');if(m)m.scrollTop=m.scrollHeight;},50);
   }
 }
 
-// ── SAVE API KEY ──────────────────────────────────────────────────────────────
+// ── SAVE KEY ──────────────────────────────────────────────────────────────────
 window.saveKey=function(){
   const v=document.getElementById('api-key-inp').value.trim();
   if(v){apiKey=v;localStorage.setItem('crm_api_key',v);render();}
 };
 
-// ── SEND CHAT ─────────────────────────────────────────────────────────────────
+// ── CHAT ──────────────────────────────────────────────────────────────────────
 async function sendChat(text){
   chatMessages.push({role:'user',text});
   chatMessages.push({role:'ai',text:'Analizando tu pipeline…',loading:true});
@@ -684,56 +626,48 @@ async function sendChat(text){
   const activos=allProspects.filter(p=>p.fechaC&&!p.esCerrado);
   const cerrados=allProspects.filter(p=>p.esCerrado);
 
-  const context=`CRM asesor financiero independiente, Argentina. Fecha hoy: ${TODAY.toLocaleDateString('es-AR')}.
+  const context=`CRM asesor financiero independiente. Argentina. Hoy: ${TODAY.toLocaleDateString('es-AR')}.
 
-PRODUCTOS (lógica de asignación):
-• Fuera de Argentina → IT exterior (Investors Trust)
-• Argentina + edad ≥50 → IT/INVIU (inversión de capital, no ahorro)
-• Argentina + edad <50 + ingreso ≥3M → Zurich Retiro (plan de retiro, mayor comisión)
-• Argentina + edad <50 + ingreso <3M → Life
+PRODUCTOS (foco: mayor comisión):
+1. Zurich Retiro → Argentina, edad <50, ingreso ≥3M/mes
+2. Life → Argentina, edad <50, ingreso <3M/mes  
+3. IT exterior (Investors Trust) → fuera de Argentina O edad ≥50
+4. INVIU → inversiones en Argentina +USD20k
+5. Patrimonial → complementario, no foco principal
 
-PIPELINE:
+PIPELINE HOY:
 Total BD: ${allProspects.length} | Activos: ${activos.length} | Cerrados: ${cerrados.length}
-En R2 (próx. a cerrar): ${activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 2')).length}
+En R2 (próx. cierre): ${activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 2')).length}
 En R1: ${activos.filter(p=>(p.etapa||'').toLowerCase().includes('reunión 1')).length}
 Solo contactados: ${activos.filter(p=>(p.etapa||'').toLowerCase().includes('solo contactado')).length}
 
-TOP ACTIVOS (por score):
-${activos.sort((a,b)=>b.score-a.score).slice(0,18).map(p=>
-  `• ${p.nombre} | ${p.relacion} | ${p.ingreso||'sin ingreso'} | conf:${p.confianza||'?'} | ${p.edad||'?'} | ${p.ubicacion||'Argentina'} | ${p.etapa} | ${p.diasSinActividad!=null?p.diasSinActividad+'d sin act.':'sin act.'} | score:${p.score} | producto:${p.producto.label} | acción:${p.reintentoInfo.label}`
-).join('\n')}
+CLIENTES CERRADOS:
+${cerrados.map(p=>`• ${p.nombre} | ${p.productoContratado||'sin producto registrado'} | ${p.montoContratado||'sin monto'}`).join('\n')||'Ninguno aún'}
 
-SIN CONTACTAR (top score):
-${allProspects.filter(p=>!p.fechaC&&!p.esCerrado).sort((a,b)=>b.score-a.score).slice(0,10).map(p=>
-  `• ${p.nombre} | ${p.relacion} | ${p.ingreso||'sin ingreso'} | conf:${p.confianza||'?'} | ${p.edad||'?'} | score:${p.score} | producto:${p.producto.label}`
-).join('\n')}`;
+ACTIVOS (por score):
+${activos.sort((a,b)=>b.score-a.score).slice(0,18).map(p=>`• ${p.nombre} | ${p.relacion} | ${p.ingreso||'?'} | conf:${p.confianza||'?'} | ${p.edad||'?'} | ${p.ubicacion||'Argentina'} | ${p.etapa} | ${p.diasSinActividad!=null?p.diasSinActividad+'d sin act.':'sin act.'} | score:${p.score} | producto:${p.producto.label} | acción:${p.reintentoInfo.label}${p.comentario?' | nota: '+p.comentario:''}`).join('\n')}
+
+SIN CONTACTAR (top):
+${allProspects.filter(p=>!p.fechaC&&!p.esCerrado).sort((a,b)=>b.score-a.score).slice(0,10).map(p=>`• ${p.nombre} | ${p.relacion} | ${p.ingreso||'?'} | conf:${p.confianza||'?'} | ${p.edad||'?'} | score:${p.score} | producto:${p.producto.label}`).join('\n')}`;
 
   try{
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':apiKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:600,
-        system:`Sos un director comercial experto en asesoría financiera en Argentina. Analizás el CRM del asesor y das recomendaciones concretas, directas y accionables. Hablás en español rioplatense. Máximo 200 palabras. Priorizás la acción inmediata. Usás los nombres propios de los prospectos. Cuando sugerís un producto justificás con una línea. Nunca empezás con "Claro" ni "Por supuesto" ni frases genéricas.\n\n${context}`,
-        messages:chatMessages
-          .filter(m=>!m.loading)
-          .slice(-10)
-          .map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}))
+        system:`Sos un director comercial experto en asesoría financiera en Argentina. Analizás el CRM del asesor y das recomendaciones concretas y accionables. Hablás en español rioplatense. Máximo 200 palabras. Priorizás la acción inmediata sobre el análisis abstracto. Usás los nombres propios. Cuando sugerís un producto justificás en una línea. Nunca empezás con "Claro", "Por supuesto" ni frases genéricas. El foco del negocio son Zurich Retiro, Life e IT exterior — son los productos con mayor comisión.\n\n${context}`,
+        messages:chatMessages.filter(m=>!m.loading).slice(-10).map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}))
       })
     });
     const data=await resp.json();
-    const aiText=data.content?.[0]?.text||(data.error?.message||'Sin respuesta del servidor.');
+    const aiText=data.content?.[0]?.text||(data.error?.message||'Sin respuesta.');
     chatMessages=chatMessages.filter(m=>!m.loading);
     chatMessages.push({role:'ai',text:aiText});
   }catch(e){
     chatMessages=chatMessages.filter(m=>!m.loading);
-    chatMessages.push({role:'ai',text:'Error de conexión. Verificá que la API key sea válida (debe empezar con sk-ant-).'});
+    chatMessages.push({role:'ai',text:'Error de conexión. Verificá que la API key sea válida (sk-ant-...).'});
   }
   chatLoading=false;render();
 }
@@ -743,16 +677,13 @@ async function init(){
   dataStatus='loading';render();
   const text=await fetchData();
   if(text){
-    const rows=parseCSV(text);
-    allProspects=rows.map(normalizeRow).filter(Boolean);
-    dataStatus='ok';
-    loadedAt=new Date();
+    allProspects=parseCSV(text).map(normalizeRow).filter(Boolean);
+    dataStatus='ok';loadedAt=new Date();
   }else{
     dataStatus='error';
   }
   render();
 }
-
 init();
 </script>
 </body>

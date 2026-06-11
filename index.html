@@ -350,28 +350,39 @@ function parseCSV(text){
 }
 
 function normalizeRow(r){
-  const nombre=r['Nombre']||'';
+  // Fuzzy header matching — normaliza tildes y chars especiales
+  const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const rKeys=Object.keys(r);
+  const get=(...keys)=>{
+    for(const k of keys){
+      if(r[k]!==undefined&&r[k]!=='')return r[k];
+      const nk=norm(k);
+      const found=rKeys.find(rk=>norm(rk)===nk);
+      if(found&&r[found]!==undefined&&r[found]!=='')return r[found];
+    }
+    return '';
+  };
+  const nombre=get('Nombre');
   if(!nombre||nombre.toLowerCase()==='nombre')return null;
-  const fechaC=parseDate(r['Primer contacto fecha']);
-  const fechaR1=parseDate(r['Reunión 1 fecha']||r['Reunion 1 fecha']);
-  const fechaR2=parseDate(r['Reunión 2 fecha']||r['Reunion 2 fecha']);
-  const fechaRC=parseDate(r['Reunión de cierre']||r['Reunión 3']||r['Reunion 3']);
-  const fechaCierre=parseDate(r['Cierre']);
-  const etapa=r['Etapa Actual']||r['etapa actual']||'';
+  const fechaC=parseDate(get('Primer contacto fecha'));
+  const fechaR1=parseDate(get('Reunion 1 fecha','Reunión 1 fecha'));
+  const fechaR2=parseDate(get('Reunion 2 fecha','Reunión 2 fecha'));
+  const fechaRC=parseDate(get('Reunion de cierre','Reunión de cierre','Reunion 3','Reunión 3'));
+  const fechaCierre=parseDate(get('Cierre'));
+  const etapa=get('Etapa Actual','etapa actual');
   const esCerrado=etapa.toLowerCase().includes('cerrado')||etapa.toLowerCase().includes('ganado')||!!fechaCierre;
   const lastDate=esCerrado?null:(fechaR2||fechaR1||fechaC);
   const diasSinActividad=lastDate?daysSince(lastDate):null;
-
-  const prodAhorro=r['Producto Ahorro/Inversión']||r['Producto Ahorro']||'';
-  const montoAhorro=r['Monto Ahorro']||'';
-  const prodVida=r['Producto Vida']||'';
-  const montoVida=r['Monto Vida']||'';
-  const tipoPatrimonial=r['Tipo Patrimonial']||'';
-  const primaPatrimonial=r['Prima Patrimonial']||'';
-  const prodInversion=r['Producto Inversión']||r['Producto Inversion']||'';
-  const montoInversion=r['Monto Inversión']||r['Monto Inversion']||'';
-  const comentario=r['Comentario']||r['Comentarios']||'';
-  const proximoContacto=r['Próximo contacto']||r['Proximo contacto']||'';
+  const prodAhorro=get('Producto Ahorro/Inversion','Producto Ahorro');
+  const montoAhorro=get('Monto Ahorro');
+  const prodVida=get('Producto Vida');
+  const montoVida=get('Monto Vida');
+  const tipoPatrimonial=get('Tipo Patrimonial');
+  const primaPatrimonial=get('Prima Patrimonial');
+  const prodInversion=get('Producto Inversion');
+  const montoInversion=get('Monto Inversion');
+  const comentario=get('Comentario','Comentarios');
+  const proximoContacto=get('Proximo contacto','Proximo Contacto');
 
   const pChip=proximoContactoChip(proximoContacto);
 

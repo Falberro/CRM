@@ -184,7 +184,7 @@ const COMM = {
   'Inviu activa':       {pct:0.001, tipo:'inviu'},
 };
 
-function calcComision(producto, monto){
+function calcComision(producto, monto, fechaCierre){
   if(!producto||!monto)return null;
   const n=parseFloat(String(monto).replace(/[^0-9.]/g,''));
   if(isNaN(n)||n<=0)return null;
@@ -192,19 +192,24 @@ function calcComision(producto, monto){
   if(!c)return null;
   const total=n*c.pct;
   if(c.tipo==='ahorro_cuotas'){
-    return{total,cobrada:total/2,pendiente:total/2,esquema:'50% cierre / 50% a 6 meses',tipo:c.tipo};
+    // 50% al cierre, 50% a 6 meses
+    const fechaPend=fechaCierre?new Date(fechaCierre.getFullYear(),fechaCierre.getMonth()+6,fechaCierre.getDate()):null;
+    return{total,cobrada:total/2,pendiente:total/2,fechaCobro1:fechaCierre,fechaCobro2:fechaPend,esquema:'50% cierre / 50% a 6 meses',tipo:c.tipo};
   }
   if(c.tipo==='ahorro_total'){
-    return{total,cobrada:total,pendiente:0,esquema:'100% al cierre',tipo:c.tipo};
+    return{total,cobrada:total,pendiente:0,fechaCobro1:fechaCierre,fechaCobro2:null,esquema:'100% al cierre',tipo:c.tipo};
   }
   if(c.tipo==='patrimonial'){
-    return{total,cobrada:total,pendiente:0,esquema:'Recurrente anual',tipo:c.tipo};
+    // 7% de prima mensual, desde mes 3 (cierre+60 días)
+    const mensual=n*0.07; // n ya es prima mensual
+    const fechaInicio=fechaCierre?new Date(fechaCierre.getTime()+60*86400000):null;
+    return{total:mensual,cobrada:0,pendiente:0,mensual,fechaInicio,esquema:'7% prima mensual desde mes 3',tipo:c.tipo};
   }
   if(c.tipo==='inversion_unica'){
-    return{total,cobrada:total,pendiente:0,esquema:'3% del monto',tipo:c.tipo};
+    return{total,cobrada:total,pendiente:0,fechaCobro1:fechaCierre,fechaCobro2:null,esquema:'3% del monto',tipo:c.tipo};
   }
   if(c.tipo==='inviu'){
-    return{total,cobrada:0,pendiente:0,mensual:total,esquema:'~USD '+total.toFixed(0)+'/mes estimado',tipo:c.tipo};
+    return{total,cobrada:0,pendiente:0,mensual:total,fechaInicio:fechaCierre,esquema:'~USD '+total.toFixed(0)+'/mes estimado',tipo:c.tipo};
   }
   return null;
 }
@@ -403,10 +408,10 @@ function normalizeRow(r){
     fechaC,fechaR1,fechaR2,fechaRC,fechaCierre,
     diasSinActividad,esCerrado,
     // Comisiones
-    commAhorro:calcComision(prodAhorro,montoAhorro),
-    commVida:calcComision(prodVida,montoVida),
-    commPatrimonial:calcComision(tipoPatrimonial,primaPatrimonial),
-    commInversion:calcComision(prodInversion,montoInversion),
+    commAhorro:calcComision(prodAhorro,montoAhorro,fechaCierre),
+    commVida:calcComision(prodVida,montoVida,fechaCierre),
+    commPatrimonial:calcComision(tipoPatrimonial,primaPatrimonial,fechaCierre),
+    commInversion:calcComision(prodInversion,montoInversion,fechaCierre),
   };
   // Descartado si próximo contacto = NO
   p.isDescartado=proximoContacto.trim().toUpperCase()==='NO';
@@ -431,6 +436,48 @@ function sumComisiones(prospects){
   return{cobrada,pendiente,mensualInviu,recurrente};
 }
 
+// ── FLUJO MENSUAL DE COBROS ──────────────────────────────────────────────────
+// Returns map of 'YYYY-M' -> {cobrado, pendiente, patrimonial, inviu}
+function buildFlujoCobros(cerrados){
+  const mapa={};
+  const add=(key,tipo,val)=>{
+    if(!mapa[key])mapa[key]={cobrado:0,pendiente:0,patrimonial:0,inviu:0};
+    mapa[key][tipo]+=val;
+  };
+  cerrados.forEach(p=>{
+    const comms=[p.commAhorro,p.commVida,p.commPatrimonial,p.commInversion];
+    comms.forEach(c=>{
+      if(!c)return;
+      if(c.tipo==='ahorro_cuotas'||c.tipo==='ahorro_total'||c.tipo==='inversion_unica'){
+        if(c.fechaCobro1&&c.cobrada>0){
+          const k=`${c.fechaCobro1.getFullYear()}-${c.fechaCobro1.getMonth()}`;
+          add(k,'cobrado',c.cobrada);
+        }
+        if(c.fechaCobro2&&c.pendiente>0){
+          const k=`${c.fechaCobro2.getFullYear()}-${c.fechaCobro2.getMonth()}`;
+          add(k,'pendiente',c.pendiente);
+        }
+      }
+      if(c.tipo==='patrimonial'&&c.mensual>0&&c.fechaInicio){
+        // Recurrente mensual por 12 meses desde fechaInicio
+        for(let i=0;i<12;i++){
+          const d=new Date(c.fechaInicio.getFullYear(),c.fechaInicio.getMonth()+i,1);
+          const k=`${d.getFullYear()}-${d.getMonth()}`;
+          add(k,'patrimonial',c.mensual);
+        }
+      }
+      if(c.tipo==='inviu'&&c.mensual>0&&c.fechaInicio){
+        for(let i=0;i<12;i++){
+          const d=new Date(c.fechaInicio.getFullYear(),c.fechaInicio.getMonth()+i,1);
+          const k=`${d.getFullYear()}-${d.getMonth()}`;
+          add(k,'inviu',c.mensual);
+        }
+      }
+    });
+  });
+  return mapa;
+}
+
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let allProspects=[];
 let chatMessages=[{role:'ai',text:'Hola. Soy tu director comercial IA.\n\nTengo acceso en tiempo real a tu pipeline y comisiones. Podés preguntarme:\n• ¿A quién llamo hoy?\n• ¿Cuánto voy a cobrar este mes?\n• ¿Quiénes son candidatos a Zurich?\n• Análisis del embudo de este mes'}];
@@ -438,6 +485,7 @@ let currentTab='pipeline';
 let filterStage='all';
 let filterScore='all';
 let selectedMonth='all';
+let selectedCommMonth='all';
 let chatLoading=false;
 let dataStatus='loading';
 let apiKey=localStorage.getItem('crm_api_key')||'';
@@ -651,13 +699,110 @@ function render(){
   // ── CERRADOS ────────────────────────────────────────────────────────────────
   else if(currentTab==='cerrados'){
     const tots=sumComisiones(cerrados);
+    const flujo=buildFlujoCobros(cerrados);
+
+    // Month filter for cerrados
+    const flujoMonths=Object.keys(flujo).sort();
+    const allMonthsForFilter=['all',...flujoMonths];
 
     // KPIs comisiones
     const cg=el('div',{className:'comm-grid'});
-    [{val:cerrados.length,label:'Clientes',sub:'cerrados',color:'#22c55e'},{val:formatNum(tots.cobrada),label:'Comisión cobrada',sub:'one shot cerrados',color:'#22c55e'},{val:formatNum(tots.pendiente),label:'Comisión pendiente',sub:'a 6 meses',color:'#f59e0b'},{val:formatNum(tots.cobrada+tots.pendiente),label:'Total comisión',sub:'cobrada + pendiente',color:'#3b82f6'},{val:formatNum(tots.recurrente),label:'Patrimonial',sub:'recurrente anual',color:'#8b5cf6'},{val:formatNum(tots.mensualInviu,'USD '),label:'INVIU estimado',sub:'por mes',color:'#0891b2'}].forEach(k=>{
+    [{val:cerrados.length,label:'Clientes',sub:'cerrados',color:'#22c55e'},{val:formatNum(tots.cobrada),label:'Comisión cobrada',sub:'one shot cerrados',color:'#22c55e'},{val:formatNum(tots.pendiente),label:'Comisión pendiente',sub:'a 6 meses',color:'#f59e0b'},{val:formatNum(tots.cobrada+tots.pendiente),label:'Total comisión',sub:'cobrada + pendiente',color:'#3b82f6'},{val:formatNum(tots.recurrente),label:'Patrimonial',sub:'recurrente mensual',color:'#8b5cf6'},{val:formatNum(tots.mensualInviu,'USD '),label:'INVIU estimado',sub:'por mes',color:'#0891b2'}].forEach(k=>{
       cg.appendChild(el('div',{className:'comm-card'},[el('div',{className:'comm-val',style:{color:k.color||'inherit'}},[String(k.val)]),el('div',{className:'comm-label'},[k.label]),el('div',{className:'comm-sub'},[k.sub])]));
     });
     content.appendChild(cg);
+
+    // FLUJO POR MES
+    if(flujoMonths.length>0){
+      const fc2=el('div',{className:'card'});
+      fc2.appendChild(el('div',{className:'card-header'},['Flujo de cobros por mes']));
+      const mts2=el('div',{className:'month-tabs'});
+      mts2.appendChild(el('button',{className:'month-tab'+(selectedCommMonth==='all'?' active':''),onclick:()=>{selectedCommMonth='all';render();}},[' Todo']));
+      flujoMonths.forEach(key=>{
+        mts2.appendChild(el('button',{className:'month-tab'+(selectedCommMonth===key?' active':''),onclick:()=>{selectedCommMonth=key;render();}},[monthLabel(key)]));
+      });
+      fc2.appendChild(mts2);
+
+      const fb2=el('div',{style:{padding:'12px 14px'}});
+
+      const renderFlujoRow=(key,data)=>{
+        const total=(data.cobrado||0)+(data.pendiente||0)+(data.patrimonial||0)+(data.inviu||0);
+        const row=el('div',{style:{display:'grid',gridTemplateColumns:'90px 1fr 1fr 1fr 1fr 80px',gap:'8px',alignItems:'center',padding:'7px 0',borderBottom:'0.5px solid rgba(0,0,0,.06)'}});
+        const mn=key.split('-').map(Number);
+        const label=`${MONTHS[mn[1]]} ${mn[0]}`;
+        row.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'500'}},[label]));
+        row.appendChild(el('span',{style:{fontSize:'11px',color:'#22c55e'}},[data.cobrado?formatNum(data.cobrado):'—']));
+        row.appendChild(el('span',{style:{fontSize:'11px',color:'#f59e0b'}},[data.pendiente?formatNum(data.pendiente):'—']));
+        row.appendChild(el('span',{style:{fontSize:'11px',color:'#8b5cf6'}},[data.patrimonial?formatNum(data.patrimonial):'—']));
+        row.appendChild(el('span',{style:{fontSize:'11px',color:'#0891b2'}},[data.inviu?formatNum(data.inviu,'USD '):'—']));
+        row.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'600'}},[formatNum(total)]));
+        return row;
+      };
+
+      // Header row
+      const hrow=el('div',{style:{display:'grid',gridTemplateColumns:'90px 1fr 1fr 1fr 1fr 80px',gap:'8px',alignItems:'center',padding:'0 0 6px',marginBottom:'2px',borderBottom:'1px solid rgba(0,0,0,.1)'}});
+      ['Mes','Cobrado','A 6 meses','Patrimonial','INVIU','Total'].forEach((h,i)=>{
+        hrow.appendChild(el('span',{style:{fontSize:'10px',color:'#888',fontWeight:'600',textTransform:'uppercase',letterSpacing:'.04em'}},[h]));
+      });
+      fb2.appendChild(hrow);
+
+      if(selectedCommMonth==='all'){
+        // Show all months
+        flujoMonths.forEach(key=>{
+          fb2.appendChild(renderFlujoRow(key,flujo[key]));
+        });
+        // Total row
+        const totFlujo={cobrado:0,pendiente:0,patrimonial:0,inviu:0};
+        flujoMonths.forEach(k=>{Object.keys(totFlujo).forEach(t=>totFlujo[t]+=(flujo[k][t]||0));});
+        const trow=el('div',{style:{display:'grid',gridTemplateColumns:'90px 1fr 1fr 1fr 1fr 80px',gap:'8px',alignItems:'center',padding:'8px 0 0',marginTop:'4px',borderTop:'1px solid rgba(0,0,0,.1)'}});
+        ['TOTAL',formatNum(totFlujo.cobrado),formatNum(totFlujo.pendiente),formatNum(totFlujo.patrimonial),formatNum(totFlujo.inviu,'USD '),formatNum(Object.values(totFlujo).reduce((a,b)=>a+b,0))].forEach((v,i)=>{
+          trow.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'700',color:i===0?'#888':'inherit'}},[v]));
+        });
+        fb2.appendChild(trow);
+      } else {
+        const data=flujo[selectedCommMonth]||{cobrado:0,pendiente:0,patrimonial:0,inviu:0};
+        fb2.appendChild(renderFlujoRow(selectedCommMonth,data));
+        // Show which clients contribute this month
+        const mn=selectedCommMonth.split('-').map(Number);
+        const contrib=[];
+        cerrados.forEach(p=>{
+          const items=[];
+          [p.commAhorro,p.commVida,p.commPatrimonial,p.commInversion].forEach((c,ci)=>{
+            if(!c)return;
+            const prods=[p.prodAhorro,p.prodVida,p.tipoPatrimonial,p.prodInversion][ci];
+            if(c.tipo==='ahorro_cuotas'||c.tipo==='ahorro_total'||c.tipo==='inversion_unica'){
+              if(c.fechaCobro1&&c.fechaCobro1.getFullYear()===mn[0]&&c.fechaCobro1.getMonth()===mn[1]&&c.cobrada>0)
+                items.push({prod:prods,val:c.cobrada,tipo:'cobrado'});
+              if(c.fechaCobro2&&c.fechaCobro2.getFullYear()===mn[0]&&c.fechaCobro2.getMonth()===mn[1]&&c.pendiente>0)
+                items.push({prod:prods,val:c.pendiente,tipo:'pendiente'});
+            }
+            if((c.tipo==='patrimonial'||c.tipo==='inviu')&&c.mensual>0&&c.fechaInicio){
+              for(let i=0;i<12;i++){
+                const d=new Date(c.fechaInicio.getFullYear(),c.fechaInicio.getMonth()+i,1);
+                if(d.getFullYear()===mn[0]&&d.getMonth()===mn[1])
+                  items.push({prod:prods,val:c.mensual,tipo:c.tipo==='patrimonial'?'patrimonial':'inviu'});
+              }
+            }
+          });
+          if(items.length)contrib.push({nombre:p.nombre,items});
+        });
+        if(contrib.length){
+          fb2.appendChild(el('div',{style:{marginTop:'12px',fontSize:'11px',fontWeight:'600',color:'#888',textTransform:'uppercase',letterSpacing:'.04em',paddingBottom:'6px'}},['Detalle de clientes']));
+          contrib.forEach(c=>{
+            const crow=el('div',{style:{padding:'6px 0',borderBottom:'0.5px solid rgba(0,0,0,.06)',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'4px'}});
+            crow.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'500'}},[c.nombre]));
+            const tags=el('div',{style:{display:'flex',gap:'4px',flexWrap:'wrap'}});
+            c.items.forEach(it=>{
+              const col=it.tipo==='cobrado'?'#22c55e':it.tipo==='pendiente'?'#f59e0b':it.tipo==='patrimonial'?'#8b5cf6':'#0891b2';
+              tags.appendChild(el('span',{style:{fontSize:'10px',padding:'2px 6px',borderRadius:'3px',background:col+'22',color:col,fontWeight:'500'}},[it.prod+' '+formatNum(it.val)]));
+            });
+            crow.appendChild(tags);
+            fb2.appendChild(crow);
+          });
+        }
+      }
+      fc2.appendChild(fb2);content.appendChild(fc2);
+    }
 
     const cc=el('div',{className:'card'});
     cc.appendChild(el('div',{className:'card-header'},['Detalle por cliente']));
